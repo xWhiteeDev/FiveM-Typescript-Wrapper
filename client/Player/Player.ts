@@ -1,4 +1,5 @@
 import { Utils } from '../Utlis/Utils';
+import { ePedVarComp, IWeaponOptions } from '../typings/Player';
 import { JSONString } from '../typings/Unions';
 import { IVector3 } from '../typings/Vector3';
 
@@ -129,6 +130,60 @@ export class Player {
   get coords() {
     const [x, y, z] = GetEntityCoords(this.playerPedId, true);
     return { x, y, z };
+  }
+  giveWeapon(hashNumber: number, ammo: number, options?: IWeaponOptions) {
+    if (!hashNumber) {
+      console.error('[giveWeapon]:hashNumber not provided');
+      return;
+    }
+    if (!ammo) {
+      console.error('[giveWeapon]:ammo not provided');
+      return;
+    }
+    if (typeof hashNumber !== 'number') {
+      console.error('[giveWeapon]: hashNumber type can be only number');
+      return;
+    }
+    if (typeof ammo !== 'number') {
+      console.error('[giveWeapon]: Ammo type can be only number');
+      return;
+    }
+    GiveWeaponToPed(this.playerPedId, hashNumber, ammo, options?.isHidden ?? false, options?.bForceInHand ?? false);
+  }
+  removeSpecifiedWeapon(hashNumber: number) {
+    if (!hashNumber) {
+      console.error('[removeSpecifiedWeapon]:hashNumber not provided');
+      return;
+    }
+    if (typeof hashNumber !== 'number') {
+      console.error('[removeSpecifiedWeapon]: hashNumber type can be only number');
+      return;
+    }
+    RemoveWeaponFromPed(this.playerPedId, hashNumber);
+  }
+  removeAllWeapons() {
+    RemoveAllPedWeapons(this.playerPedId, true);
+  }
+  setClothes(componentId: ePedVarComp, drawableId: number, textureId: number, paletteId: number) {
+    //todo tomorrow
+  }
+  removeSpecifiedClothes() {
+    //todo tomorrow if possible
+  }
+  getClothes() {
+    //todo
+  }
+  setHeadBlendData() {
+    //todo tomorrow
+  }
+  getHeadBlendData() {
+    //todo tomorrow
+  }
+  setFaceFeatures() {
+    //todo
+  }
+  getFaceFeatures() {
+    //todo
   }
   private async syncSpawn(data: JSONString) {
     try {
