@@ -10,6 +10,7 @@ export class Player {
     console.log(`[WRAPPER] Attached playerId: ${playerId} | playerPedId: ${playerPedId} `);
     onNet('wrapper:executeSpawn', this.syncSpawn.bind(this));
     onNet('wrapper:changeModel', this.syncChangeModel.bind(this));
+    onNet('wrapper:setCoords', this.syncCoordsChange.bind(this));
   }
 
   async spawn(hashModel: string, coords: IVector3): Promise<boolean> {
@@ -130,24 +131,30 @@ export class Player {
     return { x, y, z };
   }
   private async syncSpawn(data: JSONString) {
-    const { model, coords }: { model: string; coords: IVector3 } = JSON.parse(data);
-    if (!model || !coords) {
+    try {
+      const { model, coords }: { model: string; coords: IVector3 } = JSON.parse(data);
+      await this.spawn(model, coords);
+    } catch (error) {
+      console.error('[syncSpawn]:Parsing model or coordinates error');
       return;
     }
-    await this.spawn(model, coords);
   }
   private async syncChangeModel(data: JSONString) {
-    const { newModel }: { newModel: string } = JSON.parse(data);
-    if (!newModel) {
+    try {
+      const { newModel }: { newModel: string } = JSON.parse(data);
+      await this.changeModel(newModel);
+    } catch (error) {
+      console.error('[syncChangeModel]:Parsing model error');
       return;
     }
-    await this.changeModel(newModel);
   }
   private async syncCoordsChange(data: JSONString) {
-    const { newModel }: { newModel: string } = JSON.parse(data);
-    if (!newModel) {
+    try {
+      const { coords }: { coords: IVector3 } = JSON.parse(data);
+      await this.setCoords(coords);
+    } catch (error) {
+      console.error('[syncCoordsChange]:Parsing coordinates error');
       return;
     }
-    await this.changeModel(newModel);
   }
 }
