@@ -1,7 +1,8 @@
+//Version 1.0 
+//It can't be ideal. It only needs to work actually.
 import { Player } from '../Player/Player';
 
 export class CFX {
-  private static currentEventExecutor: number;
   private constructor() {}
   static addEventListener(eventName: string, handler: Function) {
     if (!eventName) {
@@ -12,9 +13,9 @@ export class CFX {
       console.error('[addEventListener]: Handler is not provided!');
       return;
     }
-    CFX.currentEventExecutor = source;
     onNet(eventName, (args: any) => {
-      handler(CFX.currentEventExecutor, args);
+      const src = source
+      handler(src, args);
     });
   }
   static addPlayerSyncEventListener<T extends unknown[]>(eventName: string, handler: (player: Player, ...args: T) => void) {
@@ -25,7 +26,7 @@ export class CFX {
         console.warn(`[${eventName}] Player dont have instance: ${source}`);
         return;
       }
-      handler(player,...args)
+      handler(player, ...args);
     });
   }
 }
