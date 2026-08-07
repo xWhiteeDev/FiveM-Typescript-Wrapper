@@ -1,9 +1,15 @@
 import { Utils } from '../Utlis/Utils';
-import { ePedVarComp, IWeaponOptions } from '../typings/Player';
+import { ePedFaceFeature, ePedVarComp, IPedClothes, IPedProperties, IWeaponOptions } from '../typings/Player';
 import { JSONString } from '../typings/Unions';
 import { IVector3 } from '../typings/Vector3';
+import { playerClothDefaultConfiguration } from './config/cfg';
 
 export class Player {
+  private pedProperties: IPedProperties = {
+    clothes: [],
+    headBlendData: {},
+    faceFeatures: [],
+  };
   constructor(
     private playerId: number,
     private playerPedId: number,
@@ -52,6 +58,7 @@ export class Player {
     this.playerPedId = newPlayerPedId;
     NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, 0, 0, false);
     SetPedDefaultComponentVariation(this.playerPedId);
+
     ClearPedTasksImmediately(this.playerPedId);
     FreezeEntityPosition(this.playerPedId, true);
 
@@ -73,10 +80,18 @@ export class Player {
     // }
     FreezeEntityPosition(this.playerPedId, false);
 
-    SetPedDefaultComponentVariation(this.playerPedId);
     SetModelAsNoLongerNeeded(hashNumber);
     ShutdownLoadingScreenNui();
     ShutdownLoadingScreen();
+    const clothes = this.getWornClothes();
+    if (!clothes) {
+      this.pedProperties.clothes = playerClothDefaultConfiguration;
+      for (const component of playerClothDefaultConfiguration) {
+        this.setClothes(component.componentId, component.drawableId, component.textureId, component.textureId);
+      }
+    } else {
+      this.pedProperties.clothes = clothes;
+    }
     return true;
   }
   async changeModel(newModel: string): Promise<boolean> {
@@ -165,25 +180,123 @@ export class Player {
     RemoveAllPedWeapons(this.playerPedId, true);
   }
   setClothes(componentId: ePedVarComp, drawableId: number, textureId: number, paletteId: number) {
-    //todo tomorrow
+    if (!componentId || !drawableId || !textureId || !paletteId) {
+      console.error('[setClothes]: One of arguments mismatch');
+      return;
+    }
+    if (
+      typeof componentId !== 'number' ||
+      typeof drawableId !== 'number' ||
+      typeof textureId !== 'number' ||
+      typeof paletteId !== 'number'
+    ) {
+      console.error('[setClothes] One of argument is not a number');
+      return;
+    }
+    SetPedComponentVariation(this.playerPedId, componentId, drawableId, textureId, paletteId);
   }
-  removeSpecifiedClothes() {
-    //todo tomorrow if possible
+  getWornClothes(): IPedClothes[] | undefined {
+    const payload: IPedClothes[] = [];
+    for (let i = 0; i <= 11; i++) {
+      const drawableId = GetPedDrawableVariation(this.playerPedId, i);
+      const textureId = GetPedTextureVariation(this.playerPedId, i);
+      const paletteId = GetPedPaletteVariation(this.playerPedId, i);
+      payload.push({ componentId: i, drawableId, textureId, paletteId });
+    }
+    if (payload.length === 0) {
+      console.error('[getWornClothes]: Clothes payload seems to be empty.');
+      return;
+    }
+    return payload;
   }
-  getClothes() {
-    //todo
+  removeSpecifiedClothes(componentId: number) {
+    if (!componentId) {
+      console.error('[removeSpecifiedClothes]: componentId argument not provided');
+      return;
+    }
+    if (typeof componentId !== 'number') {
+      console.error('[removeSpecifiedClothes]: componentId can be only number');
+      return;
+    }
+    const record = this.pedProperties.clothes.find((v) => v.componentId === componentId);
+    if (!record) {
+      console.error('[removeSpecifiedClothes]: Cannot remove specified cloth.');
+      return;
+    }
+    record.drawableId = -1;
+    SetPedComponentVariation(this.playerPedId, componentId, -1, record.textureId, record.paletteId);
   }
-  setHeadBlendData() {
-    //todo tomorrow
+  getSpecifiedCloth(componentId: number): IPedClothes | undefined {
+    if (!componentId) {
+      console.error('[getSpecifiedClot]: componentId is not provided');
+      return;
+    }
+    const record = this.pedProperties.clothes.find((v) => v.componentId === componentId);
+    return record ?? undefined;
+  }
+  getSavedClothes() {
+    return this.pedProperties.clothes ?? [];
+  }
+  setHeadBlendData(shapeFirstID: number, shapeSecondID: number, shapeMix: number, skinMix: number) {
+    if (!shapeFirstID || !shapeSecondID || !shapeMix || !skinMix) {
+      console.error('[setHeadBlendData]: One of those arguments are empty!');
+      return;
+    }
+    if (
+      typeof shapeFirstID !== 'number' ||
+      typeof shapeSecondID !== 'number' ||
+      typeof skinMix !== 'number' ||
+      typeof shapeMix !== 'number'
+    ) {
+      console.error('[setHeadBlendData]: One of those arguments are not a number!');
+      return;
+    }
+    SetPedHeadBlendData(
+      this.playerPedId,
+      shapeFirstID,
+      shapeSecondID,
+      0,
+      shapeFirstID,
+      shapeSecondID,
+      0,
+      shapeMix,
+      skinMix,
+      0,
+      true,
+    );
+    this.pedProperties.headBlendData = {
+      shapeFirstID,
+      shapeSecondID,
+      skinFirstID: shapeFirstID,
+      skinSecondID: shapeSecondID,
+      shapeMix,
+      skinMix,
+    };
   }
   getHeadBlendData() {
-    //todo tomorrow
+    return this.pedProperties.headBlendData;
   }
-  setFaceFeatures() {
-    //todo
+  setFaceFeatures(index: ePedFaceFeature, scale: number) {
+    if (!index || !scale) {
+      console.error('[setFaceFeature]: One of these arguments are empty');
+      return;
+    }
+    if (typeof index !== 'number' || typeof scale !== 'number') {
+      console.error('[setFaceFeature]: Only number is acceptable for these arguments');
+      return;
+    }
+    const headBlendData = Object.keys(this.pedProperties.headBlendData);
+    if (headBlendData.length < 11) {
+      console.error('[setFaceFeature]: You need headBlendData before setting face features!');
+      return;
+    }
+    SetPedFaceFeature(this.playerPedId, index, scale);
+  }
+  getSpecifiedFaceFeature(index: number) {
+    return GetPedFaceFeature(this.playerPedId, index);
   }
   getFaceFeatures() {
-    //todo
+    return this.pedProperties.faceFeatures;
   }
   private async syncSpawn(data: JSONString) {
     try {
