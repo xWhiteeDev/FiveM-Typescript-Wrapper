@@ -1,9 +1,10 @@
+//Version 1.0 
+//It can't be ideal. It only needs to work actually.
+
 import { Utils } from '../Utlis/Utils';
 import { ePedFaceFeature, ePedVarComp, IPedClothes, IPedProperties, IWeaponOptions } from '../typings/Player';
 import { JSONString } from '../typings/Unions';
 import { IVector3 } from '../typings/Vector3';
-import { playerClothDefaultConfiguration } from './config/cfg';
-
 export class Player {
   private pedProperties: IPedProperties = {
     clothes: [],
@@ -22,6 +23,9 @@ export class Player {
     onNet('wrapper:removeWeapon', this.syncRemoveWeapon.bind(this));
     onNet('wrapper:removeAllWeapons', this.syncRemoveAllWeapons.bind(this));
     onNet('wrapper:setClothes', this.syncChangeClothes.bind(this));
+    onNet('wrapper:removeCloth', this.syncRemoveSpecifiedCloth.bind(this));
+    onNet('wrapper:setHeadBlendData', this.syncSetHeadBlendData.bind(this));
+    onNet('wrapper:setFaceFeatures', this.syncSetFaceFeatures.bind(this));
   }
 
   async spawn(hashModel: string, coords: IVector3): Promise<boolean> {
@@ -86,7 +90,7 @@ export class Player {
 
     SetModelAsNoLongerNeeded(hashNumber);
     ShutdownLoadingScreenNui();
-    ShutdownLoadingScreen(); 
+    ShutdownLoadingScreen();
     return true;
   }
   async changeModel(newModel: string): Promise<boolean> {
@@ -268,7 +272,7 @@ export class Player {
     return this.pedProperties.headBlendData;
   }
   setFaceFeatures(index: ePedFaceFeature, scale: number) {
-    if (index === undefined || scale=== undefined) {
+    if (index === undefined || scale === undefined) {
       console.error('[setFaceFeature]: One of these arguments are empty');
       return;
     }
@@ -302,8 +306,10 @@ export class Player {
     try {
       const { newModel }: { newModel: string } = JSON.parse(data);
       await this.changeModel(newModel);
+      emitNet('wrapper:result:sync:model', newModel, true);
     } catch (error) {
       console.error('[syncChangeModel]:Parsing model error');
+      emitNet('wrapper:result:sync:model', null, false);
       return;
     }
   }
@@ -311,8 +317,10 @@ export class Player {
     try {
       const { coords }: { coords: IVector3 } = JSON.parse(data);
       await this.setCoords(coords);
+      emitNet('wrapper:result:sync:coords', coords, true);
     } catch (error) {
       console.error('[syncCoordsChange]:Parsing coordinates error');
+      emitNet('wrapper:result:sync:coords', null, false);
       return;
     }
   }
@@ -320,20 +328,27 @@ export class Player {
     try {
       const { hashNumber, ammo, options } = JSON.parse(data);
       this.giveWeapon(hashNumber, ammo, options);
+      emitNet('wrapper:result:sync:weapon', hashNumber, ammo, true, options);
     } catch (error) {
       console.error('[syncGiveWeapon]: Parsing error');
+      emitNet('wrapper:result:sync:weapon', null, null, false, null);
+
       return;
     }
   }
   private syncRemoveWeapon(hashNumber: number) {
     if (!hashNumber || typeof hashNumber !== 'number') {
       console.error('[syncRemoveWeapon]: Argument error');
+      emitNet('wrapper:result:sync:removeWeapon', hashNumber, false);
+
       return;
     }
     this.removeSpecifiedWeapon(hashNumber);
+    emitNet('wrapper:result:sync:removeWeapon', hashNumber, true);
   }
   private syncRemoveAllWeapons() {
     this.removeAllWeapons();
+    emitNet('wrapper:result:sync:removeAllWeapons', true);
   }
   private syncChangeClothes(data: JSONString) {
     try {
@@ -344,8 +359,47 @@ export class Player {
         paletteId: number;
       };
       this.setClothes(componentId, drawableId, textureId, paletteId);
+      emitNet('wrapper:result:sync:setClothes', JSON.stringify({ componentId, drawableId, textureId, paletteId }), true);
     } catch (error) {
       console.error('[syncGiveWeapon]: Parsing error');
+      emitNet('wrapper:result:sync:setClothes', JSON.stringify({}), false);
+
+      return;
+    }
+  }
+  private syncRemoveSpecifiedCloth(componentId: number) {
+    if (!componentId) {
+      console.error('[syncRemoveSpecifiedCloth]: componentId mismatch');
+      emitNet('wrapper:result:sync:removeSpecifiedCloth', componentId, false);
+      return;
+    }
+    this.removeSpecifiedClothes(componentId);
+    emitNet('wrapper:result:sync:removeSpecifiedCloth', componentId, true);
+  }
+  private syncSetHeadBlendData(data: JSONString) {
+    try {
+      const { shapeFirstID, shapeSecondID, shapeMix, skinMix } = JSON.parse(data) as {
+        shapeFirstID: number;
+        shapeSecondID: number;
+        shapeMix: number;
+        skinMix: number;
+      };
+      this.setHeadBlendData(shapeFirstID, shapeSecondID, shapeMix, skinMix);
+      emitNet('wrapper:result:sync:setHeadBlendData', data, true);
+    } catch (error) {
+      console.error('[syncSetHeadBlendData]: Parsing error');
+      emitNet('wrapper:result:sync:setHeadBlendData', data, false);
+      return;
+    }
+  }
+  private syncSetFaceFeatures(data: JSONString) {
+    try {
+      const { index, scale } = JSON.parse(data) as { index: number; scale: number };
+      this.setFaceFeatures(index, scale);
+      emitNet('wrapper:result:sync:setFaceFeatures', data, true);
+    } catch (error) {
+      console.error('[syncSetFaceFeatures]: Parsing error');
+      emitNet('wrapper:result:sync:setFaceFeatures', data, false);
       return;
     }
   }

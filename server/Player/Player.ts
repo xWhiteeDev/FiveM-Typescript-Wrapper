@@ -1,3 +1,5 @@
+//Version 1.0 
+//It can't be ideal. It only needs to work actually.
 import { CFX } from '../CFX/cfx';
 import {
   ePedFaceFeature,
@@ -170,7 +172,7 @@ export class Player {
       return;
     }
     this.pending.faceFeatures?.set(index, { index, scale });
-    emitNet('wrapper:setFaceFeatures', this.source, JSON.stringify({ index, scale}));
+    emitNet('wrapper:setFaceFeatures', this.source, JSON.stringify({ index, scale }));
   }
   getSpecifiedFaceFeature(index: number) {
     return this.current.faceFeatures.get(index);
@@ -217,7 +219,168 @@ export class Player {
     }
     player.pending.weapons?.delete(hashNumber);
   }
+  static handleSyncWeaponRemoval(player: Player, hashNumber: number, success: boolean) {
+    const pendingRemovalWeapon = player.pending.removableWeapons?.has(hashNumber);
+    if (!pendingRemovalWeapon) return;
+    if (success) {
+      player.current.weapons.delete(hashNumber);
+    } else {
+      console.warn(`[handleSyncWeaponRemoval]:Player with src: ${player.source} tried to remove weapon but unsucessfully. `);
+    }
+    player.pending.removableWeapons?.delete(hashNumber);
+  }
+  static handleSyncAllWeaponsRemove(player: Player, success: boolean) {
+    if (success) {
+      player.current.weapons.clear();
+    }
+    player.pending.removableAllWeapons = false;
+  }
+  static handleSyncClothesChange(player: Player, data: string, success: boolean) {
+    if (success) {
+      try {
+        const { componentId, drawableId, textureId, paletteId } = JSON.parse(data) as {
+          componentId: ePedVarComp;
+          drawableId: number;
+          textureId: number;
+          paletteId: number;
+        };
+        const expectedClothes = player.pending.clothes?.get(componentId);
+        const isMatch =
+          expectedClothes &&
+          expectedClothes.componentId === componentId &&
+          expectedClothes.drawableId === drawableId &&
+          expectedClothes.textureId === textureId &&
+          expectedClothes.paletteId === paletteId;
+        if (isMatch) {
+          player.current.clothes.set(componentId, { componentId, drawableId, textureId, paletteId });
+        } else {
+          console.warn(
+            `[handleSyncClothesChange]:Player with src: ${player.source} tried to change other clothes than expected!`,
+          );
+        }
+      } catch (error) {
+        console.warn(`[handleSyncClothesChange]:Player with src: ${player.source} parsing error`);
+      }
+    } else {
+      console.warn(`[handleSyncClothesChange]:Player with src: ${player.source} clothes change failed`);
+    }
+    player.pending.clothes?.clear();
+  }
+  static handleSyncSpecifiedClothesRemoval(player: Player, componentId: number, success: boolean) {
+    const pendingRemovalAction = player.pending.removedClothesComponentId === componentId;
+    if (pendingRemovalAction && success) {
+      const record = player.current.clothes.get(componentId);
+      if (!record) {
+        console.warn(
+          `[handleSyncSpecifiedClothesRemoval]:Player with src: ${player.source} tried to remove cloth but record not found!`,
+        );
+        return;
+      }
+      player.current.clothes.set(componentId, {
+        componentId,
+        drawableId: -1,
+        textureId: record.textureId,
+        paletteId: record.paletteId,
+      });
+    } else {
+      console.warn(
+        `[handleSyncSpecifiedClothesRemoval]:Player with src: ${player.source} tried to remove cloth operation failed or expected not match with current`,
+      );
+    }
+    player.pending.removedClothesComponentId = undefined;
+  }
+
+  static handleSyncSetHeadBlendData(player: Player, data: string, success: boolean) {
+    if (success) {
+      const expectedHeadBlendData = player.pending.headBlendData;
+      try {
+        const providedHeadBlendData = JSON.parse(data) as {
+          shapeFirstID: number;
+          shapeSecondID: number;
+          shapeMix: number;
+          skinMix: number;
+        };
+        const isMatch =
+          expectedHeadBlendData?.shapeFirstID === providedHeadBlendData.shapeFirstID &&
+          expectedHeadBlendData.shapeSecondID === providedHeadBlendData.shapeSecondID &&
+          expectedHeadBlendData.shapeMix === providedHeadBlendData.shapeMix &&
+          expectedHeadBlendData.skinMix === providedHeadBlendData.skinMix;
+        if (isMatch) {
+          player.current.headBlendData = providedHeadBlendData;
+        } else {
+          console.warn(
+            `[handleSyncSetHeadBlendData]:Player with src: ${player.source} tried to change head blend data but values not matching!`,
+          );
+        }
+        player.pending.headBlendData = undefined;
+      } catch (error) {
+        console.warn(`[handleSyncSetHeadBlendData]:Player with src: ${player.source} parsing json error. `);
+      }
+    } else {
+      console.warn(`[handleSyncSetHeadBlendData]:Player with src: ${player.source} failed change head blend data. `);
+    }
+  }
+  static handleSyncSetFaceFeature(player: Player, data: string, success: boolean) {
+    if (success && data) {
+      try {
+        const { index, scale } = JSON.parse(data) as { index: number; scale: number };
+        const expectedFaceFeature = player.pending.faceFeatures?.get(index);
+        if (!expectedFaceFeature) {
+          console.warn(
+            `[handleSyncSetFaceFeature]:Player with src: ${player.source} tried to apply face features but record not found!`,
+          );
+          player.pending.faceFeatures?.clear();
+          return;
+        }
+        if (scale === expectedFaceFeature.scale) {
+          player.current.faceFeatures.set(index, { index, scale });
+        } else {
+          console.warn(
+            `[handleSyncSetFaceFeature]:Player with src: ${player.source} tried to apply face features with different scale`,
+          );
+        }
+        player.pending.faceFeatures?.clear();
+      } catch (error) {
+        console.warn(`[handleSyncSetFaceFeature]:Player with src: ${player.source} parsing json error. `);
+      }
+    }
+  }
 }
+
 CFX.addPlayerSyncEventListener('wrapper:result:sync:model', (player: Player, newModel: string, success: boolean) => {
   Player.handleSyncModelChange(player, newModel, success);
+});
+
+CFX.addPlayerSyncEventListener('wrapper:result:sync:coords', (player: Player, newCoords: IVector3, success: boolean) => {
+  Player.handleSyncCoordsChange(player, newCoords, success);
+});
+CFX.addPlayerSyncEventListener(
+  'wrapper:result:sync:weapon',
+  (player: Player, hashNumber: number, ammo: number, success: boolean, options?: IWeaponOptions) => {
+    Player.handleSyncWeaponChange(player, hashNumber, ammo, success, options);
+  },
+);
+
+CFX.addPlayerSyncEventListener('wrapper:result:sync:removeWeapon', (player: Player, hashNumber: number, success: boolean) => {
+  Player.handleSyncWeaponRemoval(player, hashNumber, success);
+});
+
+CFX.addPlayerSyncEventListener('wrapper:result:sync:removeAllWeapons', (player: Player, success: boolean) => {
+  Player.handleSyncAllWeaponsRemove(player, success);
+});
+CFX.addPlayerSyncEventListener('wrapper:result:sync:setClothes', (player: Player, data: string, success: boolean) => {
+  Player.handleSyncClothesChange(player, data, success);
+});
+
+CFX.addPlayerSyncEventListener(
+  'wrapper:result:sync:removeSpecifiedCloth',
+  (player: Player, componentId: number, success: boolean) => {
+    Player.handleSyncSpecifiedClothesRemoval(player, componentId, success);
+  },
+);
+CFX.addPlayerSyncEventListener('wrapper:result:sync:setHeadBlendData', (player: Player, data: string, success: boolean) => {
+  Player.handleSyncSetHeadBlendData(player, data, success);
+});
+CFX.addPlayerSyncEventListener('wrapper:result:sync:setFaceFeatures', (player: Player, data: string, success: boolean) => {
+  Player.handleSyncSetFaceFeature(player,data,success)
 });
