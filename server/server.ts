@@ -1,12 +1,10 @@
 // import {Player} from "./Player/Player";
 
 import { Player } from './Player/Player';
-import { Utils } from './Utils/Utils';
 
-on('playerJoining', async (deferrals: { defer: any; done: any; handover: any; presentCard: any; update: any }) => {
-  // deferrals.done();
-});
-let src;
+// on('playerJoining', async (deferrals: { defer: any; done: any; handover: any; presentCard: any; update: any }) => {
+//   // deferrals.done();
+// });
 onNet('playerReady', () => {
   const src = String(source);
 
