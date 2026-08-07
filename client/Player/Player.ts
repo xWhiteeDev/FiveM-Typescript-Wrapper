@@ -18,6 +18,10 @@ export class Player {
     onNet('wrapper:executeSpawn', this.syncSpawn.bind(this));
     onNet('wrapper:changeModel', this.syncChangeModel.bind(this));
     onNet('wrapper:setCoords', this.syncCoordsChange.bind(this));
+    onNet('wrapper:giveWeapon', this.syncGiveWeapon.bind(this));
+    onNet('wrapper:removeWeapon', this.syncRemoveWeapon.bind(this));
+    onNet('wrapper:removeAllWeapons', this.syncRemoveAllWeapons.bind(this));
+    onNet('wrapper:setClothes', this.syncChangeClothes.bind(this));
   }
 
   async spawn(hashModel: string, coords: IVector3): Promise<boolean> {
@@ -82,16 +86,7 @@ export class Player {
 
     SetModelAsNoLongerNeeded(hashNumber);
     ShutdownLoadingScreenNui();
-    ShutdownLoadingScreen();
-    const clothes = this.getWornClothes();
-    if (!clothes) {
-      this.pedProperties.clothes = playerClothDefaultConfiguration;
-      for (const component of playerClothDefaultConfiguration) {
-        this.setClothes(component.componentId, component.drawableId, component.textureId, component.textureId);
-      }
-    } else {
-      this.pedProperties.clothes = clothes;
-    }
+    ShutdownLoadingScreen(); 
     return true;
   }
   async changeModel(newModel: string): Promise<boolean> {
@@ -180,7 +175,7 @@ export class Player {
     RemoveAllPedWeapons(this.playerPedId, true);
   }
   setClothes(componentId: ePedVarComp, drawableId: number, textureId: number, paletteId: number) {
-    if (!componentId || !drawableId || !textureId || !paletteId) {
+    if (componentId === undefined || drawableId === undefined || textureId === undefined || paletteId === undefined) {
       console.error('[setClothes]: One of arguments mismatch');
       return;
     }
@@ -203,14 +198,10 @@ export class Player {
       const paletteId = GetPedPaletteVariation(this.playerPedId, i);
       payload.push({ componentId: i, drawableId, textureId, paletteId });
     }
-    if (payload.length === 0) {
-      console.error('[getWornClothes]: Clothes payload seems to be empty.');
-      return;
-    }
     return payload;
   }
   removeSpecifiedClothes(componentId: number) {
-    if (!componentId) {
+    if (componentId === undefined) {
       console.error('[removeSpecifiedClothes]: componentId argument not provided');
       return;
     }
@@ -227,7 +218,7 @@ export class Player {
     SetPedComponentVariation(this.playerPedId, componentId, -1, record.textureId, record.paletteId);
   }
   getSpecifiedCloth(componentId: number): IPedClothes | undefined {
-    if (!componentId) {
+    if (componentId === undefined) {
       console.error('[getSpecifiedClot]: componentId is not provided');
       return;
     }
@@ -238,7 +229,7 @@ export class Player {
     return this.pedProperties.clothes ?? [];
   }
   setHeadBlendData(shapeFirstID: number, shapeSecondID: number, shapeMix: number, skinMix: number) {
-    if (!shapeFirstID || !shapeSecondID || !shapeMix || !skinMix) {
+    if (shapeFirstID === undefined || shapeSecondID === undefined || shapeMix === undefined || skinMix === undefined) {
       console.error('[setHeadBlendData]: One of those arguments are empty!');
       return;
     }
@@ -277,7 +268,7 @@ export class Player {
     return this.pedProperties.headBlendData;
   }
   setFaceFeatures(index: ePedFaceFeature, scale: number) {
-    if (!index || !scale) {
+    if (index === undefined || scale=== undefined) {
       console.error('[setFaceFeature]: One of these arguments are empty');
       return;
     }
@@ -322,6 +313,39 @@ export class Player {
       await this.setCoords(coords);
     } catch (error) {
       console.error('[syncCoordsChange]:Parsing coordinates error');
+      return;
+    }
+  }
+  private syncGiveWeapon(data: JSONString) {
+    try {
+      const { hashNumber, ammo, options } = JSON.parse(data);
+      this.giveWeapon(hashNumber, ammo, options);
+    } catch (error) {
+      console.error('[syncGiveWeapon]: Parsing error');
+      return;
+    }
+  }
+  private syncRemoveWeapon(hashNumber: number) {
+    if (!hashNumber || typeof hashNumber !== 'number') {
+      console.error('[syncRemoveWeapon]: Argument error');
+      return;
+    }
+    this.removeSpecifiedWeapon(hashNumber);
+  }
+  private syncRemoveAllWeapons() {
+    this.removeAllWeapons();
+  }
+  private syncChangeClothes(data: JSONString) {
+    try {
+      const { componentId, drawableId, textureId, paletteId } = JSON.parse(data) as {
+        componentId: ePedVarComp;
+        drawableId: number;
+        textureId: number;
+        paletteId: number;
+      };
+      this.setClothes(componentId, drawableId, textureId, paletteId);
+    } catch (error) {
+      console.error('[syncGiveWeapon]: Parsing error');
       return;
     }
   }
