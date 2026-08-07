@@ -41,7 +41,7 @@ export interface IPlayerCurrentState {
 export interface IPlayerPendingState {
   model?: string;
   coords?: IVector3;
-  removableWeapons: Set;
+  removableWeapons: Set<number>;
   removableAllWeapons: boolean;
   removedClothesComponentId: number;
   weapons: Map<number, IWeapon>;
