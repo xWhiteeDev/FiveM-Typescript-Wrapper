@@ -1,4 +1,4 @@
-//Version 1.0 
+//Version 1.0
 //It can't be ideal. It only needs to work actually.
 
 import { Utils } from '../Utlis/Utils';
@@ -91,6 +91,9 @@ export class Player {
     SetModelAsNoLongerNeeded(hashNumber);
     ShutdownLoadingScreenNui();
     ShutdownLoadingScreen();
+    emitNet('playerSpawned');
+    emit('spawned');
+
     return true;
   }
   async changeModel(newModel: string): Promise<boolean> {
@@ -318,6 +321,7 @@ export class Player {
       const { coords }: { coords: IVector3 } = JSON.parse(data);
       await this.setCoords(coords);
       emitNet('wrapper:result:sync:coords', coords, true);
+      emitNet('playerChangeCoords', coords)
     } catch (error) {
       console.error('[syncCoordsChange]:Parsing coordinates error');
       emitNet('wrapper:result:sync:coords', null, false);
