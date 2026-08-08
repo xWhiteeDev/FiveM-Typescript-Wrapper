@@ -1,3 +1,4 @@
+
 export class CFX {
   private static events = new Map<string, Function>();
   private constructor() {}
@@ -16,6 +17,6 @@ export class CFX {
       console.error('[addEventListener]: eventName or handler argument not provided');
       return;
     }
-    onNet(eventName, handler);
+   
   }
 }
