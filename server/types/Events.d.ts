@@ -1,0 +1,1 @@
+export type CFXServerEvents = 'playerSpawned' | 'playerReady' | 'playerChangeCoords'
