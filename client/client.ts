@@ -4,6 +4,7 @@ import { Player } from './Player/Player';
 on('onClientResourceStart', async (resourceName: string) => {
   if (GetCurrentResourceName() !== resourceName) return;
   Chat.init();
+  emitNet('serverCreatePlayer');
   emitNet('playerReady');
-  const localPlayer = new Player(PlayerId(), PlayerPedId());
+  new Player(PlayerId(), PlayerPedId());
 });
