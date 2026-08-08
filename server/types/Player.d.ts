@@ -1,5 +1,6 @@
 import { IVector3 } from './Vector3';
 
+
 export interface PlayerBufferElement {
   source: string;
   name: string;
@@ -30,6 +31,9 @@ export interface IClothes {
   textureId: number;
   paletteId: number;
 }
+export interface IProps extends Omit<IClothes,'paletteId'> {
+  attach:boolean
+}
 export interface IPlayerCurrentState {
   model?: string;
   coords?: IVector3;
@@ -37,6 +41,7 @@ export interface IPlayerCurrentState {
   clothes: Map<number, IPedClothes>;
   headBlendData: Partial<IPedHeadBlendData>;
   faceFeatures: Map<number, IPedFaceFeature>;
+  props:Map<number,IProps>
 }
 export interface IPlayerPendingState {
   model?: string;

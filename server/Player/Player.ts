@@ -1,12 +1,15 @@
-//Version 1.0 
+//Version 1.0
 //It can't be ideal. It only needs to work actually.
-import { CFX } from '../CFX/cfx';
+
+import { CFX } from '../CFX/Cfx';
 import {
   ePedFaceFeature,
   ePedVarComp,
   IPedClothes,
+  IPedFaceFeature,
   IPlayerCurrentState,
   IPlayerPendingState,
+  IProps,
   IWeaponOptions,
 } from '../types/Player';
 import { IVector3 } from '../types/Vector3';
@@ -18,6 +21,7 @@ export class Player {
     clothes: new Map(),
     headBlendData: {},
     faceFeatures: new Map(),
+    props: new Map(),
   };
   private static instances = new Map<string, Player>();
 
@@ -134,7 +138,13 @@ export class Player {
     }
     return this.current.clothes.get(componentId);
   }
-  getSavedClothes() {}
+  getSavedClothes() {
+    const clothes: IPedClothes[] = [];
+    this.current.clothes.forEach((v, k) => {
+      clothes.push(v);
+    });
+    return clothes;
+  }
   setHeadBlendData(shapeFirstID: number, shapeSecondID: number, shapeMix: number, skinMix: number) {
     if (shapeFirstID === undefined || shapeSecondID === undefined || shapeMix === undefined || skinMix === undefined) {
       console.error('[setHeadBlendData]: One of those arguments are empty!');
@@ -177,11 +187,39 @@ export class Player {
   getSpecifiedFaceFeature(index: number) {
     return this.current.faceFeatures.get(index);
   }
-  getFaceFeatures() {}
+  getFaceFeatures() {
+    const faceFeatures: IPedFaceFeature[] = [];
+    this.current.faceFeatures.forEach((v) => faceFeatures.push(v));
+    return faceFeatures;
+  }
+  setProp(componentId: number, drawableId: number, textureId: number, attach: boolean) {
+    SetPedPropIndex(GetPlayerPed(this.source), componentId, drawableId, textureId, attach);
+    this.current.props.set(componentId, { componentId, drawableId, textureId, attach });
+  }
+  clearProp(componentId: number) {
+    ClearPedProp(GetPlayerPed(this.source), componentId);
+    this.current.props.delete(componentId);
+  }
+  getProp(propId:number):IProps | undefined {
+    return this.current.props.get(propId)
+  }
+  get armour() {
+    return GetPedArmour(GetPlayerPed(this.source));
+  }
+  get currentWeapon() {
+    return GetCurrentPedWeapon(GetPlayerPed(this.source));
+  }
+  get health() {
+    return GetEntityHealth(GetPlayerPed(this.source));
+  }
+  get maxHealth() {
+    return GetPedMaxHealth(GetPlayerPed(this.source));
+  }
   static get(source: string): Player | undefined {
     return Player.instances.get(source);
   }
 
+  //Sync Methods
   static handleSyncModelChange(player: Player, newModel: string, success: boolean) {
     if (success && player.pending.model === newModel) {
       player.current.model = newModel;
@@ -347,40 +385,12 @@ export class Player {
   }
 }
 
-CFX.addPlayerSyncEventListener('wrapper:result:sync:model', (player: Player, newModel: string, success: boolean) => {
-  Player.handleSyncModelChange(player, newModel, success);
-});
-
-CFX.addPlayerSyncEventListener('wrapper:result:sync:coords', (player: Player, newCoords: IVector3, success: boolean) => {
-  Player.handleSyncCoordsChange(player, newCoords, success);
-});
-CFX.addPlayerSyncEventListener(
-  'wrapper:result:sync:weapon',
-  (player: Player, hashNumber: number, ammo: number, success: boolean, options?: IWeaponOptions) => {
-    Player.handleSyncWeaponChange(player, hashNumber, ammo, success, options);
-  },
-);
-
-CFX.addPlayerSyncEventListener('wrapper:result:sync:removeWeapon', (player: Player, hashNumber: number, success: boolean) => {
-  Player.handleSyncWeaponRemoval(player, hashNumber, success);
-});
-
-CFX.addPlayerSyncEventListener('wrapper:result:sync:removeAllWeapons', (player: Player, success: boolean) => {
-  Player.handleSyncAllWeaponsRemove(player, success);
-});
-CFX.addPlayerSyncEventListener('wrapper:result:sync:setClothes', (player: Player, data: string, success: boolean) => {
-  Player.handleSyncClothesChange(player, data, success);
-});
-
-CFX.addPlayerSyncEventListener(
-  'wrapper:result:sync:removeSpecifiedCloth',
-  (player: Player, componentId: number, success: boolean) => {
-    Player.handleSyncSpecifiedClothesRemoval(player, componentId, success);
-  },
-);
-CFX.addPlayerSyncEventListener('wrapper:result:sync:setHeadBlendData', (player: Player, data: string, success: boolean) => {
-  Player.handleSyncSetHeadBlendData(player, data, success);
-});
-CFX.addPlayerSyncEventListener('wrapper:result:sync:setFaceFeatures', (player: Player, data: string, success: boolean) => {
-  Player.handleSyncSetFaceFeature(player,data,success)
-});
+CFX.addPlayerSyncEventListener('wrapper:result:sync:model', Player.handleSyncModelChange);
+CFX.addPlayerSyncEventListener('wrapper:result:sync:coords', Player.handleSyncCoordsChange);
+CFX.addPlayerSyncEventListener('wrapper:result:sync:weapon', Player.handleSyncWeaponChange);
+CFX.addPlayerSyncEventListener('wrapper:result:sync:removeWeapon', Player.handleSyncWeaponRemoval);
+CFX.addPlayerSyncEventListener('wrapper:result:sync:removeAllWeapons', Player.handleSyncAllWeaponsRemove);
+CFX.addPlayerSyncEventListener('wrapper:result:sync:setClothes', Player.handleSyncClothesChange);
+CFX.addPlayerSyncEventListener('wrapper:result:sync:removeSpecifiedCloth', Player.handleSyncSpecifiedClothesRemoval);
+CFX.addPlayerSyncEventListener('wrapper:result:sync:setHeadBlendData', Player.handleSyncSetHeadBlendData);
+CFX.addPlayerSyncEventListener('wrapper:result:sync:setFaceFeatures', Player.handleSyncSetFaceFeature);
