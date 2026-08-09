@@ -1,4 +1,4 @@
 import {CFX} from '../CFX/Cfx';
-import { Player } from '../Player/Player';
+import { Player } from '../Entities/Player/Player';
 
 CFX.init(Player.get);
