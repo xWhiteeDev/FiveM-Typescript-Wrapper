@@ -1,0 +1,63 @@
+import {IPedClothes} from "../../../typings/Player";
+
+export const playerClothDefaultConfiguration:IPedClothes[] = [{
+  "componentId": 0,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 1,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 2,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 3,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 4,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 5,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 6,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 7,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 8,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 9,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 10,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}, {
+  "componentId": 11,
+  "drawableId": 0,
+  "textureId": 0,
+  "paletteId": 0
+}] 
