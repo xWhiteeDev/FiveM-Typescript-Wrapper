@@ -1,40 +1,47 @@
 //Version 1.0
 //It can't be ideal. It only needs to work actually.
 
-import { Utils } from '../Utlis/Utils';
-import { ePedFaceFeature, ePedVarComp, IPedClothes, IPedProperties, IWeaponOptions } from '../typings/Player';
-import { JSONString } from '../typings/Unions';
-import { IVector3 } from '../typings/Vector3';
+import { IPedProperties, IWeaponOptions, ePedVarComp, IPedClothes, ePedFaceFeature } from '../../typings/Player';
+import { JSONString } from '../../typings/Unions';
+import { IVector3 } from '../../typings/Vector3';
+import { eVehicleSeat } from '../../typings/Vehicle';
+import { Utils } from '../../Utlis/Utils';
+
 export class Player {
-  private pedProperties: IPedProperties = {
+  private static pedProperties: IPedProperties = {
     clothes: [],
     headBlendData: {},
     faceFeatures: [],
   };
-  constructor(
-    private playerId: number,
-    private playerPedId: number,
-  ) {
+  private static playerId: number;
+  private static playerPedId: number;
+  private static inited: boolean;
+  static init(playerId: number, playerPedId: number) {
+    if (Player.inited) return;
+    Player.playerId = playerId;
+    Player.playerPedId = playerPedId;
     console.log(`[WRAPPER] Attached playerId: ${playerId} | playerPedId: ${playerPedId} `);
-    onNet('wrapper:executeSpawn', this.syncSpawn.bind(this));
-    onNet('wrapper:changeModel', this.syncChangeModel.bind(this));
-    onNet('wrapper:setCoords', this.syncCoordsChange.bind(this));
-    onNet('wrapper:giveWeapon', this.syncGiveWeapon.bind(this));
-    onNet('wrapper:removeWeapon', this.syncRemoveWeapon.bind(this));
-    onNet('wrapper:removeAllWeapons', this.syncRemoveAllWeapons.bind(this));
-    onNet('wrapper:setClothes', this.syncChangeClothes.bind(this));
-    onNet('wrapper:removeCloth', this.syncRemoveSpecifiedCloth.bind(this));
-    onNet('wrapper:setHeadBlendData', this.syncSetHeadBlendData.bind(this));
-    onNet('wrapper:setFaceFeatures', this.syncSetFaceFeatures.bind(this));
+    onNet('wrapper:executeSpawn', Player.syncSpawn.bind(Player));
+    onNet('wrapper:changeModel', Player.syncChangeModel.bind(Player));
+    onNet('wrapper:setCoords', Player.syncCoordsChange.bind(Player));
+    onNet('wrapper:giveWeapon', Player.syncGiveWeapon.bind(Player));
+    onNet('wrapper:removeWeapon', Player.syncRemoveWeapon.bind(Player));
+    onNet('wrapper:removeAllWeapons', Player.syncRemoveAllWeapons.bind(Player));
+    onNet('wrapper:setClothes', Player.syncChangeClothes.bind(Player));
+    onNet('wrapper:removeCloth', Player.syncRemoveSpecifiedCloth.bind(Player));
+    onNet('wrapper:setHeadBlendData', Player.syncSetHeadBlendData.bind(Player));
+    onNet('wrapper:setFaceFeatures', Player.syncSetFaceFeatures.bind(Player));
+    onNet('wrapper:setHealth', Player.setHealth.bind(Player));
+    onNet('wrapper:setMaxHealth', Player.setMaxHealth.bind(Player));
   }
 
-  async spawn(hashModel: string, coords: IVector3): Promise<boolean> {
+  static async spawn(hashModel: string, coords: IVector3): Promise<boolean> {
     const hashNumber: number = GetHashKey(hashModel);
     const maxAttempts: number = 200;
-    if (!IsEntityPositionFrozen(this.playerPedId)) {
-      FreezeEntityPosition(this.playerPedId, true);
+    if (!IsEntityPositionFrozen(Player.playerPedId)) {
+      FreezeEntityPosition(Player.playerPedId, true);
     }
-    const playerActive: boolean = await Utils.waitUntil(() => NetworkIsPlayerActive(this.playerId), {
+    const playerActive: boolean = await Utils.waitUntil(() => NetworkIsPlayerActive(Player.playerId), {
       waitInterval: 150,
       maxAttempts: 50,
     });
@@ -61,42 +68,34 @@ export class Player {
       SetModelAsNoLongerNeeded(hashNumber);
       return false;
     }
-    SetPlayerModel(this.playerId, hashNumber);
+    SetPlayerModel(Player.playerId, hashNumber);
     const newPlayerPedId = PlayerPedId();
-    this.playerPedId = newPlayerPedId;
+    Player.playerPedId = newPlayerPedId;
     NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, 0, 0, false);
-    SetPedDefaultComponentVariation(this.playerPedId);
+    SetPedDefaultComponentVariation(Player.playerPedId);
 
-    ClearPedTasksImmediately(this.playerPedId);
-    FreezeEntityPosition(this.playerPedId, true);
+    ClearPedTasksImmediately(Player.playerPedId);
+    FreezeEntityPosition(Player.playerPedId, true);
 
-    SetEntityCoordsNoOffset(this.playerPedId, coords.x, coords.y, coords.z, true, true, true);
+    SetEntityCoordsNoOffset(Player.playerPedId, coords.x, coords.y, coords.z, true, true, true);
     RequestCollisionAtCoord(coords.x, coords.y, coords.z);
 
-    const hasCollisionLoaded: boolean = await Utils.waitUntil(() => HasCollisionLoadedAroundEntity(this.playerPedId), {
+    const hasCollisionLoaded: boolean = await Utils.waitUntil(() => HasCollisionLoadedAroundEntity(Player.playerPedId), {
       waitInterval: 100,
       maxAttempts,
       onTick: () => {
         RequestCollisionAtCoord(coords.x, coords.y, coords.z);
       },
     });
-
-    // if (!hasCollisionLoaded) {
-    //   console.error('Cannot load collisions around Entity');
-    //   FreezeEntityPosition(this.playerPedId, false);
-    //   return false;
-    // }
-    FreezeEntityPosition(this.playerPedId, false);
+    FreezeEntityPosition(Player.playerPedId, false);
 
     SetModelAsNoLongerNeeded(hashNumber);
     ShutdownLoadingScreenNui();
     ShutdownLoadingScreen();
-    emitNet('playerSpawned');
-    emit('spawned');
-
+    emit('playerSpawned', coords);
     return true;
   }
-  async changeModel(newModel: string): Promise<boolean> {
+  static async changeModel(newModel: string): Promise<boolean> {
     const maxAttempts: number = 100;
     const hashKey = GetHashKey(newModel);
     if (!IsModelValid(hashKey)) {
@@ -115,40 +114,58 @@ export class Player {
       return false;
     }
 
-    SetPlayerModel(this.playerId, hashKey);
-    this.playerPedId = PlayerPedId();
-    SetPedDefaultComponentVariation(this.playerPedId);
+    SetPlayerModel(Player.playerId, hashKey);
+    Player.playerPedId = PlayerPedId();
+    SetPedDefaultComponentVariation(Player.playerPedId);
     SetModelAsNoLongerNeeded(hashKey);
     return true;
   }
-  get currentPedId() {
-    return this.playerPedId;
+  static get currentPedId() {
+    return Player.playerPedId;
   }
-  async setCoords(coords: IVector3): Promise<boolean> {
+  static setIntoVehicle(handle: number, seat: eVehicleSeat) {
+    const targetVehicleHash: number = GetEntityModel(handle);
+    if (!targetVehicleHash) {
+      console.error('[setIntoVehicle]: Vehicle handle not exist');
+      return;
+    }
+    const seatsCount = GetVehicleModelNumberOfSeats(targetVehicleHash);
+    let availableSeat: number;
+    if (seat > seatsCount) {
+      availableSeat = -2;
+    } else {
+      availableSeat = seat;
+    }
+    if (GetPedInVehicleSeat(handle, availableSeat)) {
+      return;
+    }
+    SetPedIntoVehicle(PlayerPedId(), handle, seat);
+  }
+  static async setCoords(coords: IVector3): Promise<boolean> {
     const maxAttempts: number = 100;
-    const wasEntityPositionFrozen: boolean = IsEntityPositionFrozen(this.playerPedId);
+    const wasEntityPositionFrozen: boolean = IsEntityPositionFrozen(Player.playerPedId);
 
-    SetEntityCoordsNoOffset(this.playerPedId, coords.x, coords.y, coords.z, true, true, true);
+    SetEntityCoordsNoOffset(Player.playerPedId, coords.x, coords.y, coords.z, true, true, true);
     if (!wasEntityPositionFrozen) {
-      FreezeEntityPosition(this.playerPedId, true);
+      FreezeEntityPosition(Player.playerPedId, true);
     }
 
-    const isCollisionLoaded = await Utils.waitUntil(() => HasCollisionLoadedAroundEntity(this.playerPedId), {
+    const isCollisionLoaded = await Utils.waitUntil(() => HasCollisionLoadedAroundEntity(Player.playerPedId), {
       waitInterval: 50,
       maxAttempts,
       onTick: () => RequestCollisionAtCoord(coords.x, coords.y, coords.z),
     });
 
     if (!wasEntityPositionFrozen) {
-      FreezeEntityPosition(this.playerPedId, false);
+      FreezeEntityPosition(Player.playerPedId, false);
     }
     return isCollisionLoaded;
   }
-  get coords() {
-    const [x, y, z] = GetEntityCoords(this.playerPedId, true);
+  static get coords() {
+    const [x, y, z] = GetEntityCoords(Player.playerPedId, true);
     return { x, y, z };
   }
-  giveWeapon(hashNumber: number, ammo: number, options?: IWeaponOptions) {
+  static giveWeapon(hashNumber: number, ammo: number, options?: IWeaponOptions) {
     if (!hashNumber) {
       console.error('[giveWeapon]:hashNumber not provided');
       return;
@@ -165,9 +182,9 @@ export class Player {
       console.error('[giveWeapon]: Ammo type can be only number');
       return;
     }
-    GiveWeaponToPed(this.playerPedId, hashNumber, ammo, options?.isHidden ?? false, options?.bForceInHand ?? false);
+    GiveWeaponToPed(Player.playerPedId, hashNumber, ammo, options?.isHidden ?? false, options?.bForceInHand ?? false);
   }
-  removeSpecifiedWeapon(hashNumber: number) {
+  static removeSpecifiedWeapon(hashNumber: number) {
     if (!hashNumber) {
       console.error('[removeSpecifiedWeapon]:hashNumber not provided');
       return;
@@ -176,12 +193,12 @@ export class Player {
       console.error('[removeSpecifiedWeapon]: hashNumber type can be only number');
       return;
     }
-    RemoveWeaponFromPed(this.playerPedId, hashNumber);
+    RemoveWeaponFromPed(Player.playerPedId, hashNumber);
   }
-  removeAllWeapons() {
-    RemoveAllPedWeapons(this.playerPedId, true);
+  static removeAllWeapons() {
+    RemoveAllPedWeapons(Player.playerPedId, true);
   }
-  setClothes(componentId: ePedVarComp, drawableId: number, textureId: number, paletteId: number) {
+  static setClothes(componentId: ePedVarComp, drawableId: number, textureId: number, paletteId: number) {
     if (componentId === undefined || drawableId === undefined || textureId === undefined || paletteId === undefined) {
       console.error('[setClothes]: One of arguments mismatch');
       return;
@@ -195,19 +212,19 @@ export class Player {
       console.error('[setClothes] One of argument is not a number');
       return;
     }
-    SetPedComponentVariation(this.playerPedId, componentId, drawableId, textureId, paletteId);
+    SetPedComponentVariation(Player.playerPedId, componentId, drawableId, textureId, paletteId);
   }
-  getWornClothes(): IPedClothes[] | undefined {
+  static getWornClothes(): IPedClothes[] | undefined {
     const payload: IPedClothes[] = [];
     for (let i = 0; i <= 11; i++) {
-      const drawableId = GetPedDrawableVariation(this.playerPedId, i);
-      const textureId = GetPedTextureVariation(this.playerPedId, i);
-      const paletteId = GetPedPaletteVariation(this.playerPedId, i);
+      const drawableId = GetPedDrawableVariation(Player.playerPedId, i);
+      const textureId = GetPedTextureVariation(Player.playerPedId, i);
+      const paletteId = GetPedPaletteVariation(Player.playerPedId, i);
       payload.push({ componentId: i, drawableId, textureId, paletteId });
     }
     return payload;
   }
-  removeSpecifiedClothes(componentId: number) {
+  static removeSpecifiedClothes(componentId: number) {
     if (componentId === undefined) {
       console.error('[removeSpecifiedClothes]: componentId argument not provided');
       return;
@@ -216,26 +233,26 @@ export class Player {
       console.error('[removeSpecifiedClothes]: componentId can be only number');
       return;
     }
-    const record = this.pedProperties.clothes.find((v) => v.componentId === componentId);
+    const record = Player.pedProperties.clothes.find((v) => v.componentId === componentId);
     if (!record) {
       console.error('[removeSpecifiedClothes]: Cannot remove specified cloth.');
       return;
     }
     record.drawableId = -1;
-    SetPedComponentVariation(this.playerPedId, componentId, -1, record.textureId, record.paletteId);
+    SetPedComponentVariation(Player.playerPedId, componentId, -1, record.textureId, record.paletteId);
   }
-  getSpecifiedCloth(componentId: number): IPedClothes | undefined {
+  static getSpecifiedCloth(componentId: number): IPedClothes | undefined {
     if (componentId === undefined) {
       console.error('[getSpecifiedClot]: componentId is not provided');
       return;
     }
-    const record = this.pedProperties.clothes.find((v) => v.componentId === componentId);
+    const record = Player.pedProperties.clothes.find((v) => v.componentId === componentId);
     return record ?? undefined;
   }
   getSavedClothes() {
-    return this.pedProperties.clothes ?? [];
+    return Player.pedProperties.clothes ?? [];
   }
-  setHeadBlendData(shapeFirstID: number, shapeSecondID: number, shapeMix: number, skinMix: number) {
+  static setHeadBlendData(shapeFirstID: number, shapeSecondID: number, shapeMix: number, skinMix: number) {
     if (shapeFirstID === undefined || shapeSecondID === undefined || shapeMix === undefined || skinMix === undefined) {
       console.error('[setHeadBlendData]: One of those arguments are empty!');
       return;
@@ -250,7 +267,7 @@ export class Player {
       return;
     }
     SetPedHeadBlendData(
-      this.playerPedId,
+      Player.playerPedId,
       shapeFirstID,
       shapeSecondID,
       0,
@@ -262,7 +279,7 @@ export class Player {
       0,
       true,
     );
-    this.pedProperties.headBlendData = {
+    Player.pedProperties.headBlendData = {
       shapeFirstID,
       shapeSecondID,
       skinFirstID: shapeFirstID,
@@ -271,10 +288,10 @@ export class Player {
       skinMix,
     };
   }
-  getHeadBlendData() {
-    return this.pedProperties.headBlendData;
+  static getHeadBlendData() {
+    return Player.pedProperties.headBlendData;
   }
-  setFaceFeatures(index: ePedFaceFeature, scale: number) {
+  static setFaceFeatures(index: ePedFaceFeature, scale: number) {
     if (index === undefined || scale === undefined) {
       console.error('[setFaceFeature]: One of these arguments are empty');
       return;
@@ -283,32 +300,51 @@ export class Player {
       console.error('[setFaceFeature]: Only number is acceptable for these arguments');
       return;
     }
-    const headBlendData = Object.keys(this.pedProperties.headBlendData);
+    const headBlendData = Object.keys(Player.pedProperties.headBlendData);
     if (headBlendData.length < 11) {
       console.error('[setFaceFeature]: You need headBlendData before setting face features!');
       return;
     }
-    SetPedFaceFeature(this.playerPedId, index, scale);
+    SetPedFaceFeature(Player.playerPedId, index, scale);
   }
-  getSpecifiedFaceFeature(index: number) {
-    return GetPedFaceFeature(this.playerPedId, index);
+  static getSpecifiedFaceFeature(index: number) {
+    if (index === undefined) {
+      console.error('[getSpecifiedFaceFeature]: index not provided!');
+      return;
+    }
+    return GetPedFaceFeature(Player.playerPedId, index);
   }
-  getFaceFeatures() {
-    return this.pedProperties.faceFeatures;
+  static getFaceFeatures() {
+    return Player.pedProperties.faceFeatures;
   }
-  private async syncSpawn(data: JSONString) {
+  static setHealth(value: number) {
+    if (value === undefined) {
+      console.error('[setHealth]: value not provided!');
+      return;
+    }
+    SetEntityHealth(Player.playerPedId, value);
+  }
+  static setMaxHealth(value: number) {
+    if (value === undefined) {
+      console.error('[setHealth]: value not provided!');
+      return;
+    }
+    SetEntityMaxHealth(Player.playerPedId, value);
+  }
+  private static async syncSpawn(data: JSONString) {
     try {
       const { model, coords }: { model: string; coords: IVector3 } = JSON.parse(data);
-      await this.spawn(model, coords);
+      await Player.spawn(model, coords);
+      emitNet('wrapper:result:sync:spawn', model, coords, true);
     } catch (error) {
       console.error('[syncSpawn]:Parsing model or coordinates error');
       return;
     }
   }
-  private async syncChangeModel(data: JSONString) {
+  private static async syncChangeModel(data: JSONString) {
     try {
       const { newModel }: { newModel: string } = JSON.parse(data);
-      await this.changeModel(newModel);
+      await Player.changeModel(newModel);
       emitNet('wrapper:result:sync:model', newModel, true);
     } catch (error) {
       console.error('[syncChangeModel]:Parsing model error');
@@ -316,45 +352,44 @@ export class Player {
       return;
     }
   }
-  private async syncCoordsChange(data: JSONString) {
+  private static async syncCoordsChange(data: JSONString) {
     try {
       const { coords }: { coords: IVector3 } = JSON.parse(data);
-      await this.setCoords(coords);
+      await Player.setCoords(coords);
       emitNet('wrapper:result:sync:coords', coords, true);
-      emitNet('playerChangeCoords', coords)
+      emitNet('playerChangeCoords', coords);
     } catch (error) {
       console.error('[syncCoordsChange]:Parsing coordinates error');
       emitNet('wrapper:result:sync:coords', null, false);
       return;
     }
   }
-  private syncGiveWeapon(data: JSONString) {
+  private static syncGiveWeapon(data: JSONString) {
     try {
       const { hashNumber, ammo, options } = JSON.parse(data);
-      this.giveWeapon(hashNumber, ammo, options);
+      Player.giveWeapon(hashNumber, ammo, options);
       emitNet('wrapper:result:sync:weapon', hashNumber, ammo, true, options);
     } catch (error) {
       console.error('[syncGiveWeapon]: Parsing error');
       emitNet('wrapper:result:sync:weapon', null, null, false, null);
-
       return;
     }
   }
-  private syncRemoveWeapon(hashNumber: number) {
+  private static syncRemoveWeapon(hashNumber: number) {
     if (!hashNumber || typeof hashNumber !== 'number') {
       console.error('[syncRemoveWeapon]: Argument error');
       emitNet('wrapper:result:sync:removeWeapon', hashNumber, false);
 
       return;
     }
-    this.removeSpecifiedWeapon(hashNumber);
+    Player.removeSpecifiedWeapon(hashNumber);
     emitNet('wrapper:result:sync:removeWeapon', hashNumber, true);
   }
-  private syncRemoveAllWeapons() {
-    this.removeAllWeapons();
+  private static syncRemoveAllWeapons() {
+    Player.removeAllWeapons();
     emitNet('wrapper:result:sync:removeAllWeapons', true);
   }
-  private syncChangeClothes(data: JSONString) {
+  private static syncChangeClothes(data: JSONString) {
     try {
       const { componentId, drawableId, textureId, paletteId } = JSON.parse(data) as {
         componentId: ePedVarComp;
@@ -362,7 +397,7 @@ export class Player {
         textureId: number;
         paletteId: number;
       };
-      this.setClothes(componentId, drawableId, textureId, paletteId);
+      Player.setClothes(componentId, drawableId, textureId, paletteId);
       emitNet('wrapper:result:sync:setClothes', JSON.stringify({ componentId, drawableId, textureId, paletteId }), true);
     } catch (error) {
       console.error('[syncGiveWeapon]: Parsing error');
@@ -371,16 +406,16 @@ export class Player {
       return;
     }
   }
-  private syncRemoveSpecifiedCloth(componentId: number) {
+  private static syncRemoveSpecifiedCloth(componentId: number) {
     if (!componentId) {
       console.error('[syncRemoveSpecifiedCloth]: componentId mismatch');
       emitNet('wrapper:result:sync:removeSpecifiedCloth', componentId, false);
       return;
     }
-    this.removeSpecifiedClothes(componentId);
+    Player.removeSpecifiedClothes(componentId);
     emitNet('wrapper:result:sync:removeSpecifiedCloth', componentId, true);
   }
-  private syncSetHeadBlendData(data: JSONString) {
+  private static syncSetHeadBlendData(data: JSONString) {
     try {
       const { shapeFirstID, shapeSecondID, shapeMix, skinMix } = JSON.parse(data) as {
         shapeFirstID: number;
@@ -388,7 +423,7 @@ export class Player {
         shapeMix: number;
         skinMix: number;
       };
-      this.setHeadBlendData(shapeFirstID, shapeSecondID, shapeMix, skinMix);
+      Player.setHeadBlendData(shapeFirstID, shapeSecondID, shapeMix, skinMix);
       emitNet('wrapper:result:sync:setHeadBlendData', data, true);
     } catch (error) {
       console.error('[syncSetHeadBlendData]: Parsing error');
@@ -396,10 +431,10 @@ export class Player {
       return;
     }
   }
-  private syncSetFaceFeatures(data: JSONString) {
+  private static syncSetFaceFeatures(data: JSONString) {
     try {
       const { index, scale } = JSON.parse(data) as { index: number; scale: number };
-      this.setFaceFeatures(index, scale);
+      Player.setFaceFeatures(index, scale);
       emitNet('wrapper:result:sync:setFaceFeatures', data, true);
     } catch (error) {
       console.error('[syncSetFaceFeatures]: Parsing error');
