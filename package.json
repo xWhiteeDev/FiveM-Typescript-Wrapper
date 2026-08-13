@@ -1,6 +1,6 @@
 {
   "name": "fivem-typescript",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A FiveM simple typescript wrapper",
   "exports": {
     "./server": {
@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node esbuild.config.js && npx tsc -p tsconfig.client.json && npx tsc -p tsconfig.server.json"
   },
   "repository": {
     "type": "git",
@@ -34,5 +34,5 @@
     "glob": "^13.0.6",
     "typescript": "^7.0.2"
   },
-  "files":["dist"]
+  "files":["dist", "README.md"]
 }
