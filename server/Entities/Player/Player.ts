@@ -1,7 +1,7 @@
 //Version 1.0
 //It can't be ideal. It only needs to work actually.
 
-import { CFX } from '../../CFX/Cfx';
+import { CFX } from '../../CFX/cfx';
 import {
   ePedFaceFeature,
   ePedVarComp,
@@ -13,6 +13,8 @@ import {
   IWeaponOptions,
 } from '../../types/Player';
 import { IVector3 } from '../../types/Vector3';
+import { eVehicleSeat } from '../../types/Vehicle';
+import type { Vehicle } from '../Vehicle/Vehicle';
 
 export class Player {
   private pending: Partial<IPlayerPendingState> = {};
@@ -235,38 +237,72 @@ export class Player {
     }
     FreezeEntityPosition(GetPlayerPed(this.source), state);
   }
-  set armour(value: number) {
+  putIntoVehicle(vehicle: Vehicle, seat: eVehicleSeat) {
+    if (!vehicle || seat === undefined) {
+      console.error(`[Player][putIntoVehicle]: Vehicle or seat argument is empty.`);
+      return;
+    }
+    const { handle } = vehicle;
+    if (!handle) {
+      console.error('[Player][putIntoVehicle]: Vehicle not exist!');
+      return;
+    }
+    SetPedIntoVehicle(this.pedId, handle, seat);
+  }
+  getIdentifier(identifierIndex: number) {
+    return GetPlayerIdentifier(this.source, identifierIndex);
+  }
+
+  getIdentifierByType(identifierType: string) {
+    return GetPlayerIdentifierByType(this.source, identifierType);
+  }
+
+  getPeerStatistics(peerStatistic: number) {
+    return GetPlayerPeerStatistics(this.source, peerStatistic);
+  }
+
+  getTimeInPursuit(lastPursuit: boolean) {
+    return GetPlayerTimeInPursuit(this.source, lastPursuit);
+  }
+
+  getToken(index: number) {
+    return GetPlayerToken(this.source, index);
+  }
+  isAceAllowed(object: string) {
+    return IsPlayerAceAllowed(this.source, object);
+  }
+  set pedArmour(value: number) {
     if (value === undefined) {
       console.error(`[armour]: value not provided!`);
       return;
     }
     SetPedArmour(GetPlayerPed(this.source), value);
   }
-  get armour() {
+  get pedArmour() {
     return GetPedArmour(GetPlayerPed(this.source));
   }
   get currentWeapon() {
     return GetCurrentPedWeapon(GetPlayerPed(this.source));
   }
-  set health(value: number) {
+  setHealth(value: number) {
     if (value === undefined) {
       console.error(`[health]: value not provided!`);
       return;
     }
-    emitNet('wrapper:setHealth', value);
+    emitNet('wrapper:setHealth',this.source ,value);
   }
-  set maxHealth(value: number) {
+  setMaxHealth(value: number) {
     if (value === undefined) {
       console.error(`[maxHealth]: value not provided!`);
       return;
     }
-    emitNet('wrapper:setMaxHealth', value);
+    emitNet('wrapper:setMaxHealth',this.source, value);
   }
   get health() {
     return GetEntityHealth(GetPlayerPed(this.source));
   }
   get maxHealth() {
-    return GetPedMaxHealth(GetPlayerPed(this.source));
+    return GetPlayerMaxHealth(this.source);
   }
   get isInVehicle() {
     return IsPedInAnyVehicle(GetPlayerPed(this.source));
@@ -286,7 +322,117 @@ export class Player {
   static get(source: string): Player | undefined {
     return Player.instances.get(source);
   }
+  get cameraRotation(): IVector3 {
+    const [rotX, rotY, rotZ] = GetPlayerCameraRotation(this.source);
+    return { x: rotX, y: rotY, z: rotZ };
+  }
 
+  get endpoint() {
+    return GetPlayerEndpoint(this.source);
+  }
+
+  get fakeWantedLevel() {
+    return GetPlayerFakeWantedLevel(this.source);
+  }
+
+  get focusPos(): IVector3 {
+    const [x, y, z] = GetPlayerFocusPos(this.source);
+    return { x, y, z };
+  }
+
+  get guid() {
+    return GetPlayerGuid(this.source);
+  }
+
+  get invincible() {
+    return GetPlayerInvincible(this.source);
+  }
+
+  get lastMsg() {
+    return GetPlayerLastMsg(this.source);
+  }
+
+  get maxArmour() {
+    return GetPlayerMaxArmour(this.source);
+  }
+
+ 
+  get meleeWeaponDamageModifier() {
+    return GetPlayerMeleeWeaponDamageModifier(this.source);
+  }
+
+  get name() {
+    return GetPlayerName(this.source);
+  }
+
+  get ping() {
+    return GetPlayerPing(this.source);
+  }
+
+  get routingBucket() {
+    return GetPlayerRoutingBucket(this.source);
+  }
+
+  get team() {
+    return GetPlayerTeam(this.source);
+  }
+
+  get timeOnline() {
+    return GetPlayerTimeOnline(this.source);
+  }
+
+  get wantedCentrePosition(): IVector3 {
+    const [x, y, z] = GetPlayerWantedCentrePosition(this.source);
+    return { x, y, z };
+  }
+
+  get wantedLevel() {
+    return GetPlayerWantedLevel(this.source);
+  }
+
+  get weaponDamageModifier() {
+    return GetPlayerWeaponDamageModifier(this.source);
+  }
+
+  get weaponDefenseModifier() {
+    return GetPlayerWeaponDefenseModifier(this.source);
+  }
+
+  get weaponDefenseModifier2() {
+    return GetPlayerWeaponDefenseModifier_2(this.source);
+  }
+  get isCommerceInfoLoaded() {
+    return IsPlayerCommerceInfoLoaded(this.source);
+  }
+
+  get isCommerceInfoLoadedExt() {
+    return IsPlayerCommerceInfoLoadedExt(this.source);
+  }
+
+  get isEvadingWantedLevel() {
+    return IsPlayerEvadingWantedLevel(this.source);
+  }
+
+  get isInFreeCamMode() {
+    return IsPlayerInFreeCamMode(this.source);
+  }
+
+  get isUsingSuperJump() {
+    return IsPlayerUsingSuperJump(this.source);
+  }
+
+  get isMumbleMuted() {
+    return MumbleIsPlayerMuted(Number(this.source));
+  }
+  static getFromIndex(index: number) {
+    const src = GetPlayerFromIndex(index);
+    return Player.get(src);
+  }
+
+  static getFromStateBagName(bagName: string) {
+    const src = GetPlayerFromStateBagName(bagName);
+    return Player.get(String(src));
+  }
   //Sync Methods
 
   static handleSyncSpawn(player: Player, model: string, coords: IVector3, success: boolean) {

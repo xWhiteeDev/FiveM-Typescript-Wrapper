@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "types": ["@citizenfx/server"],
+        "lib": ["es2020"],
+        "rootDir": "./server",
+        "outDir": "./dist/server",
+        "declaration": true,
+        "emitDeclarationOnly": true
+    },
+    "include": ["server/**/*.ts"]
+}

@@ -1,6 +1,6 @@
 import { IVector3 } from '../../typings/Vector3';
 import { IVehicleOptions } from '../../typings/Vehicle';
-import { Utils } from '../../Utlis/Utils';
+import { Utils } from '../../Utils/Utils';
 
 export class Vehicle {
   private constructor(private _handle:number) {
@@ -34,6 +34,7 @@ export class Vehicle {
 
     SetEntityCoordsNoOffset(vehHandle, coords.x, coords.y, coords.z, false, false, false);
     SetModelAsNoLongerNeeded(hashKey);
+    
     return new this(vehHandle);
   }
   get handle() {

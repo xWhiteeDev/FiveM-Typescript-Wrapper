@@ -5,7 +5,7 @@ import { IPedProperties, IWeaponOptions, ePedVarComp, IPedClothes, ePedFaceFeatu
 import { JSONString } from '../../typings/Unions';
 import { IVector3 } from '../../typings/Vector3';
 import { eVehicleSeat } from '../../typings/Vehicle';
-import { Utils } from '../../Utlis/Utils';
+import { Utils } from '../../Utils/Utils';
 
 export class Player {
   private static pedProperties: IPedProperties = {

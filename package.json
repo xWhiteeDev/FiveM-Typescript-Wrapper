@@ -1,0 +1,38 @@
+{
+  "name": "fivem-typescript",
+  "version": "1.0.0",
+  "description": "A FiveM simple typescript wrapper",
+  "exports": {
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "default": "./dist/server/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "default": "./dist/client/index.js"
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xWhiteeDev/FiveM-Typescript-Wrapper.git"
+  },
+  "keywords": [],
+  "author": "xWhiteeDev",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/xWhiteeDev/FiveM-Typescript-Wrapper/issues"
+  },
+  "homepage": "https://github.com/xWhiteeDev/FiveM-Typescript-Wrapper#readme",
+  "devDependencies": {
+    "@citizenfx/client": "^2.0.34833-1",
+    "@citizenfx/server": "^2.0.34833-1",
+    "esbuild": "^0.28.2",
+    "glob": "^13.0.6",
+    "typescript": "^7.0.2"
+  },
+  "files":["dist"]
+}
