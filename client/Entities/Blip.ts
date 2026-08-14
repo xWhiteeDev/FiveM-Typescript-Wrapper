@@ -176,7 +176,6 @@ export class Blip {
     SetPedHasAiBlipWithColor(pedHandle, hasCone, color);
   }
 
-  // --- Gettery i Settery (Właściwości) ---
 
   set name(name: string) {
     AddTextEntry('MYBLIP', '~a~');
