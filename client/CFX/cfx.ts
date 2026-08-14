@@ -1,3 +1,4 @@
+
 export class CFX {
   private constructor() {}
   static emitServer(eventName: string, args?: any) {
