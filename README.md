@@ -12,11 +12,44 @@ to make my eyes happier and my code much easier to understand.
 ```bash
  npm install fivem-typescript
  ```
-2. After that just import something to your code like below:
+2. Before you will execute 3 things - Important to work.
+```ts
+import {Player} from "fivem-typescript/server"
+new Player(source) // Note: Source have to be string
+```
+```ts
+import {CFX,Player} from "fivem-typescript/server"
+CFX.init(Player.get) // Note: Important to working CFX.addEvent methods because inside, handler receives player by Player.get(source)
+```
+```ts 
+ import {LocalPlayer} from "fivem-typescript/client" 
+ LocalPlayer.initEvents() // Note: Important to work events properly. 
+ ```
+3. After that just import something to your code like below:
  ```ts
-  import {CFX} from "fivem-typescript/server"
-  CFX.addCrossEventListener("mySuperCrossEventName", myExtraHandler)
-  ```
+ import {CFX} from "fivem-typescript/server"
+ CFX.addCrossEventListener("mySuperCrossEventName", myExtraHandler)
+ ```
+## Example
+ ```ts
+ import { CFX, Player } from 'fivem-typescript/server';
+CFX.init(Player.get);
 
+const model: string = 'mp_m_freemode_01';
+const coords = { x: 0, y: 0, z: 72 };
+function playerJoining() {
+  const src = source;
+  const player = new Player(String(src)); //Note: Not always source is string so it's worth to convert it into.
+  player.spawn(model, coords);
+}
+
+on('playerJoining', playerJoining);
+
+function playerSpawned(player: Player) {
+  console.log(`Player: ${player.name} spawned!`);
+  player.giveWeapon(0x5ef9fec4, 200, { bForceInHand: true, isHidden: false });
+}
+CFX.addEventListener('playerSpawned', playerSpawned);
+```
 ## ❗Important thing
-Guys remember it's V 1.0.0 I'll be making changes. so please be patient — I'm working on giving you a proper first stable version
+Guys remember it's V 1.0 I'll be making changes. so please be patient — I'm working on giving you a proper first stable version
