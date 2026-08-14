@@ -1,4 +1,4 @@
-import { IVector3 } from '../../types/Vector3';
+import { IVector3 } from '../types/Vector3';
 
 export class Vehicle {
   private constructor(private _handle: number) {}

@@ -1,6 +1,6 @@
-import { IVector3 } from '../../typings/Vector3';
-import { IVehicleOptions } from '../../typings/Vehicle';
-import { Utils } from '../../Utils/Utils';
+import { IVector3 } from '../typings/Vector3';
+import { IVehicleOptions } from '../typings/Vehicle';
+import { Utils } from '../Utils/Utils';
 
 export class Vehicle {
   private constructor(private _handle:number) {
