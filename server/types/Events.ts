@@ -1,4 +1,4 @@
-import type { Player } from '../Entities/Player/Player';
+import type { Player } from '../Entities/Player';
 import type { IWeaponOptions } from './Player';
 import type { IVector3 } from './Vector3';
 

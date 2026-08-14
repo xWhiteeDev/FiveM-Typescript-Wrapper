@@ -1,6 +1,6 @@
 //Version 1.0
 //It can't be ideal. It only needs to work actually.
-import type { Player } from '../Entities/Player/Player';
+import type { Player } from '../Entities/Player';
 import { CFXCrossEvents, CFXServerEventsFunctions } from '../types/Events';
 export class CFX {
   private static get: (src: string) => Player | undefined;
