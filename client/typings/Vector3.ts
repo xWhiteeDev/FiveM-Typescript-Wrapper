@@ -3,3 +3,6 @@ export interface IVector3 {
     y:number;
     z:number
 }
+export interface Quaternion {
+    
+}
