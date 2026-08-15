@@ -1,11 +1,12 @@
 import { IVector3 } from '../types/Vector3';
+import { VehicleType } from '../types/Vehicle';
 import { BaseEntity } from './BaseEntity';
 
 export class Vehicle extends BaseEntity {
   private constructor(protected _handle: number) {
     super(_handle);
   }
-  static async create(model: string, coords: IVector3) {
+  static async createBySetter(model: string, type: VehicleType, coords: IVector3, heading: number) {
     if (!model) {
       console.error('[Vehicle][create]: Model argument empty');
       return;
@@ -27,8 +28,36 @@ export class Vehicle extends BaseEntity {
       console.error('[Vehicle][create]: model not valid');
       return;
     }
-    const handle = CreateVehicle(hash, coords.x, coords.y, coords.z, 0, true, true);
+    const handle = CreateVehicleServerSetter(hash, type, coords.x, coords.y, coords.z, heading);
     return new this(handle);
+  }
+  static async create(model: string, coords: IVector3, heading: number, isNetwork: boolean, netMissionEntity: boolean) {
+    if (!model) {
+      console.error('[Vehicle][create]: Model argument empty');
+      return;
+    }
+    if (!coords) {
+      console.error('[Vehicle][create]: Coords argument empty');
+      return;
+    }
+    if (typeof model !== 'string') {
+      console.error('[Vehicle][create]: Model is not a string');
+      return;
+    }
+    if (typeof coords !== 'object') {
+      console.error('[Vehicle][create]: coords is not a object');
+      return;
+    }
+    const hash = GetHashKey(model);
+    if (!hash) {
+      console.error('[Vehicle][create]: model not valid');
+      return;
+    }
+    const handle = CreateVehicle(hash, coords.x, coords.y, coords.z, heading, isNetwork, netMissionEntity);
+    return new this(handle);
+  }
+  static getAll():number[] {
+    return GetAllVehicles()
   }
   get handle(): number {
     return this._handle;
