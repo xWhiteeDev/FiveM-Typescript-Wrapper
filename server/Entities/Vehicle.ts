@@ -1,7 +1,10 @@
 import { IVector3 } from '../types/Vector3';
+import { BaseEntity } from './BaseEntity';
 
-export class Vehicle {
-  private constructor(private _handle: number) {}
+export class Vehicle extends BaseEntity {
+  private constructor(protected _handle: number) {
+    super(_handle);
+  }
   static async create(model: string, coords: IVector3) {
     if (!model) {
       console.error('[Vehicle][create]: Model argument empty');
@@ -112,7 +115,7 @@ export class Vehicle {
   isWindowIntact(windowIndex: number) {
     return IsVehicleWindowIntact(this._handle, windowIndex);
   }
-  
+
   set dirtLevel(v: number) {
     SetVehicleDirtLevel(this._handle, v);
   }
