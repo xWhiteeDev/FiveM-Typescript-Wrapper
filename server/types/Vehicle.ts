@@ -4,3 +4,5 @@ export enum eVehicleSeat {
   LR_PASS = 1,
   RR_PASS = 2,
 }
+
+export type VehicleType = 'automobile' | 'bike' | 'boat' | 'heli' | 'plane' | 'submarine' | 'trailer';
