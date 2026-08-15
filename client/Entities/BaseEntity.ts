@@ -3,6 +3,7 @@ import { Quaternion } from '../Math/Quaternion';
 import { Vector3 } from '../Math/Vector3';
 import { UTechnique } from '../typings/World';
 import { RGBA } from '../Utils/RGBA';
+import {Entity} from './Entity';
 
 export class BaseEntity {
   constructor(protected _handle: number) {}
