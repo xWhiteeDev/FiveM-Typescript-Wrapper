@@ -4,11 +4,11 @@ export interface IWeaponOptions {
 }
 
 export interface IPedProperties  {
-  clothes:IPedClothes[]
+  clothes:Map<number,IClothes>
   headBlendData: Partial<IPedHeadBlendData>
-  faceFeatures:IPedFaceFeature[]
+  faceFeatures:Map<number,IFaceFeature>
 }
-export interface IPedFaceFeature  {
+export interface IFaceFeature  {
   index:ePedFaceFeature;
   scale:number
 }
@@ -49,7 +49,7 @@ export enum ePedFaceFeature {
   ChinHole = 18,
   NeckThickness = 19,
 }
-export interface IPedClothes {
+export interface IClothes {
   componentId: number;
   drawableId: number;
   textureId: number;
