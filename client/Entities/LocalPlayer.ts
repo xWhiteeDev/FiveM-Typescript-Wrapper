@@ -1,7 +1,7 @@
 //Version 1.0
 //It can't be ideal. It only needs to work actually.
 
-import { Vector3 } from '../Math/Vector3';
+import { IVector3 } from '../typings/Vector3';
 import {
   IPedProperties,
   IWeaponOptions,
@@ -12,7 +12,6 @@ import {
   IPedHeadBlendData,
 } from '../typings/Player';
 import { JSONString } from '../typings/Unions';
-import { IVector3 } from '../typings/Vector3';
 import { eVehicleSeat } from '../typings/Vehicle';
 import { Utils } from '../Utils/Utils';
 
@@ -184,7 +183,7 @@ export class LocalPlayer {
     }
     return true;
   }
-  static get coords(): Vector3 | undefined {
+  static get coords(): IVector3 | undefined {
     if (!LocalPlayer.inited) {
       console.error('LocalPlayer is not inited! Use LocalPlayer.initEvents()');
       return undefined;
