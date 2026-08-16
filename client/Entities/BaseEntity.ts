@@ -1,9 +1,7 @@
 import type { eShader } from '../enums/eWorld';
-import { Quaternion } from '../Math/Quaternion';
-import { Vector3 } from '../Math/Vector3';
+import {IVector3 } from '../typings/Vector3';
 import { UTechnique } from '../typings/World';
 import { RGBA } from '../Utils/RGBA';
-import {Entity} from './Entity';
 
 export class BaseEntity {
   constructor(protected _handle: number) {}
@@ -21,7 +19,7 @@ export class BaseEntity {
   }
 
   static playSynchronizedMapAnim(
-    coords: Vector3,
+    coords: IVector3,
     radius: number,
     objectModelHash: number,
     sceneId: number,
@@ -62,7 +60,7 @@ export class BaseEntity {
     return new this(handle);
   }
 
-  static networkAddAngledArea(p1: Vector3, p2: Vector3, width: number): number {
+  static networkAddAngledArea(p1: IVector3, p2: IVector3, width: number): number {
     return NetworkAddEntityAngledArea(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, width);
   }
 
@@ -77,7 +75,7 @@ export class BaseEntity {
   static networkAddMapToSynchronisedScene(
     netScene: number,
     modelHash: number,
-    coords: Vector3,
+    coords: IVector3,
     animDict: string,
     animName: string,
     blendInSpeed: number,
@@ -184,7 +182,7 @@ export class BaseEntity {
     return GetEntityCanBeDamaged(this._handle);
   }
 
-  get forwardVector(): Vector3 {
+  get forwardVector(): IVector3 {
     const [x, y, z] = GetEntityForwardVector(this._handle);
     return { x, y, z };
   }
@@ -250,7 +248,7 @@ export class BaseEntity {
     return GetEntityRoll(this._handle);
   }
 
-  get rotationVelocity(): Vector3 {
+  get rotationVelocity(): IVector3 {
     const [x, y, z] = GetEntityRotationVelocity(this._handle);
     return { x, y, z };
   }
@@ -275,16 +273,15 @@ export class BaseEntity {
     return GetEntityUprightValue(this._handle);
   }
 
-  get velocity(): Vector3 {
+  get velocity(): IVector3 {
     const [x, y, z] = GetEntityVelocity(this._handle);
     return { x, y, z };
   }
 
-
   applyForce(
     forceType: number,
-    dir: Vector3,
-    off: Vector3,
+    dir: IVector3,
+    off: IVector3,
     nComponent: number,
     bLocalForce: boolean,
     bLocalOffset: boolean,
@@ -312,7 +309,7 @@ export class BaseEntity {
 
   applyForceCenterOfMass(
     forceType: number,
-    dir: Vector3,
+    dir: IVector3,
     nComponent: number,
     bLocalForce: boolean,
     bScaleByMass: boolean,
@@ -330,7 +327,16 @@ export class BaseEntity {
       bApplyToChildren,
     );
   }
+  get address(): number {
+    return GetEntityAddress(this._handle);
+  }
 
+  get archetypeName(): string {
+    return GetEntityArchetypeName(this._handle);
+  }
+  get mapdataOwner() {
+    return GetEntityMapdataOwner(this._handle)
+  }
   attachBoneToBone(entity2Handle: number, entityBone: number, entityBone2: number, p4: boolean, p5: boolean): void {
     AttachEntityBoneToEntityBone(this._handle, entity2Handle, entityBone, entityBone2, p4, p5);
   }
@@ -342,8 +348,8 @@ export class BaseEntity {
   attachTo(
     entity2Handle: number,
     boneIndex: number,
-    pos: Vector3,
-    rot: Vector3,
+    pos: IVector3,
+    rot: IVector3,
     p9: boolean,
     useSoftPinning: boolean,
     collision: boolean,
@@ -374,9 +380,9 @@ export class BaseEntity {
     entity2Handle: number,
     boneIndex1: number,
     boneIndex2: number,
-    pos1: Vector3,
-    pos2: Vector3,
-    rot: Vector3,
+    pos1: IVector3,
+    pos2: IVector3,
+    rot: IVector3,
     breakForce: number,
     fixedRot: boolean,
     p15: boolean,
@@ -451,7 +457,7 @@ export class BaseEntity {
     FreezeEntityPosition(this._handle, toggle);
   }
 
-  getCollisionNormalOfLastHit(): Vector3 {
+  getCollisionNormalOfLastHit(): IVector3 {
     const [x, y, z] = GetCollisionNormalOfLastHitForEntity(this._handle);
     return { x, y, z };
   }
@@ -468,17 +474,17 @@ export class BaseEntity {
     return GetEntityBoneIndexByName(this._handle, boneName);
   }
 
-  getBonePosition2(boneIndex: number): Vector3 {
+  getBonePosition2(boneIndex: number): IVector3 {
     const [x, y, z] = GetEntityBonePosition_2(this._handle, boneIndex);
     return { x, y, z };
   }
 
-  getBoneRotation(boneIndex: number): Vector3 {
+  getBoneRotation(boneIndex: number): IVector3 {
     const [x, y, z] = GetEntityBoneRotation(this._handle, boneIndex);
     return { x, y, z };
   }
 
-  getBoneRotationLocal(boneIndex: number): Vector3 {
+  getBoneRotationLocal(boneIndex: number): IVector3 {
     const [x, y, z] = GetEntityBoneRotationLocal(this._handle, boneIndex);
     return { x, y, z };
   }
@@ -487,12 +493,12 @@ export class BaseEntity {
     return GetEntityCollisionDisabled(this._handle);
   }
 
-  getCoords(alive: boolean = false): Vector3 {
+  getCoords(alive: boolean = false): IVector3 {
     const [x, y, z] = GetEntityCoords(this._handle, alive);
     return { x, y, z };
   }
 
-  getHeight(pos: Vector3, atTop: boolean, inWorldCoords: boolean): number {
+  getHeight(pos: IVector3, atTop: boolean, inWorldCoords: boolean): number {
     return GetEntityHeight(this._handle, pos.x, pos.y, pos.z, atTop, inWorldCoords);
   }
 
@@ -500,12 +506,12 @@ export class BaseEntity {
     return GetEntityPickup(this._handle, modelHash);
   }
 
-  getRotation(rotationOrder: number): Vector3 {
+  getRotation(rotationOrder: number): IVector3 {
     const [x, y, z] = GetEntityRotation(this._handle, rotationOrder);
     return { x, y, z };
   }
 
-  getSpeedVector(relative: boolean): Vector3 {
+  getSpeedVector(relative: boolean): IVector3 {
     const [x, y, z] = GetEntitySpeedVector(this._handle, relative);
     return { x, y, z };
   }
@@ -526,12 +532,12 @@ export class BaseEntity {
     return GetObjectIndexFromEntityIndex(this._handle);
   }
 
-  getOffsetGivenWorldCoords(pos: Vector3): Vector3 {
+  getOffsetGivenWorldCoords(pos: IVector3): IVector3 {
     const [x, y, z] = GetOffsetFromEntityGivenWorldCoords(this._handle, pos.x, pos.y, pos.z);
     return { x, y, z };
   }
 
-  getOffsetInWorldCoords(offset: Vector3): Vector3 {
+  getOffsetInWorldCoords(offset: IVector3): IVector3 {
     const [x, y, z] = GetOffsetFromEntityInWorldCoords(this._handle, offset.x, offset.y, offset.z);
     return { x, y, z };
   }
@@ -544,7 +550,7 @@ export class BaseEntity {
     return GetVehicleIndexFromEntityIndex(this._handle);
   }
 
-  getWorldPositionOfBone(boneIndex: number): Vector3 {
+  getWorldPositionOfBone(boneIndex: number): IVector3 {
     const [x, y, z] = GetWorldPositionOfEntityBone(this._handle, boneIndex);
     return { x, y, z };
   }
@@ -609,11 +615,11 @@ export class BaseEntity {
     return IsEntityAnObject(this._handle);
   }
 
-  isAtCoord(pos: Vector3, size: Vector3, highlightArea: boolean, do3dCheck: boolean, transportMode: number): boolean {
+  isAtCoord(pos: IVector3, size: IVector3, highlightArea: boolean, do3dCheck: boolean, transportMode: number): boolean {
     return IsEntityAtCoord(this._handle, pos.x, pos.y, pos.z, size.x, size.y, size.z, highlightArea, do3dCheck, transportMode);
   }
 
-  isAt(targetEntityHandle: number, size: Vector3, highlightArea: boolean, do3dCheck: boolean, transportMode: number): boolean {
+  isAt(targetEntityHandle: number, size: IVector3, highlightArea: boolean, do3dCheck: boolean, transportMode: number): boolean {
     return IsEntityAtEntity(this._handle, targetEntityHandle, size.x, size.y, size.z, highlightArea, do3dCheck, transportMode);
   }
 
@@ -645,11 +651,11 @@ export class BaseEntity {
     return IsEntityInAir(this._handle);
   }
 
-  isInAngledArea(p1: Vector3, p2: Vector3, width: number, debug: boolean, include: boolean, p10: any): boolean {
+  isInAngledArea(p1: IVector3, p2: IVector3, width: number, debug: boolean, include: boolean, p10: any): boolean {
     return IsEntityInAngledArea(this._handle, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, width, debug, include, p10);
   }
 
-  isInArea(p1: Vector3, p2: Vector3, p7: boolean, p8: boolean, p9: any): boolean {
+  isInArea(p1: IVector3, p2: IVector3, p7: boolean, p8: boolean, p9: any): boolean {
     return IsEntityInArea(this._handle, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p7, p8, p9);
   }
 
@@ -773,7 +779,7 @@ export class BaseEntity {
     SetEntityAlwaysPrerender(this._handle, toggle);
   }
 
-  setAngularVelocity(vel: Vector3): void {
+  setAngularVelocity(vel: IVector3): void {
     SetEntityAngularVelocity(this._handle, vel.x, vel.y, vel.z);
   }
 
@@ -817,15 +823,15 @@ export class BaseEntity {
     SetEntityCompletelyDisableCollision(this._handle, toggle, keepPhysics);
   }
 
-  setCoords(pos: Vector3, alive: boolean, deadFlag: boolean, ragdollFlag: boolean, clearArea: boolean): void {
+  setCoords(pos: IVector3, alive: boolean, deadFlag: boolean, ragdollFlag: boolean, clearArea: boolean): void {
     SetEntityCoords(this._handle, pos.x, pos.y, pos.z, alive, deadFlag, ragdollFlag, clearArea);
   }
 
-  setCoordsNoOffset(pos: Vector3, keepTasks: boolean, keepIk: boolean, doWarp: boolean): void {
+  setCoordsNoOffset(pos: IVector3, keepTasks: boolean, keepIk: boolean, doWarp: boolean): void {
     SetEntityCoordsNoOffset(this._handle, pos.x, pos.y, pos.z, keepTasks, keepIk, doWarp);
   }
 
-  setCoordsWithoutPlantsReset(pos: Vector3, alive: boolean, deadFlag: boolean, ragdollFlag: boolean, clearArea: boolean): void {
+  setCoordsWithoutPlantsReset(pos: IVector3, alive: boolean, deadFlag: boolean, ragdollFlag: boolean, clearArea: boolean): void {
     SetEntityCoordsWithoutPlantsReset(this._handle, pos.x, pos.y, pos.z, alive, deadFlag, ragdollFlag, clearArea);
   }
 
@@ -888,7 +894,6 @@ export class BaseEntity {
   setNoCollisionWithNetworked(entity2Handle: number): void {
     SetEntityNoCollisionWithNetworkedEntity(this._handle, entity2Handle);
   }
-
 
   isGhostedToLocalPlayer(): boolean {
     return IsEntityGhostedToLocalPlayer(this._handle);
