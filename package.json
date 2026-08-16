@@ -1,6 +1,6 @@
 {
   "name": "fivem-typescript",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A FiveM simple typescript wrapper",
   "exports": {
     "./server": {
@@ -10,6 +10,10 @@
     "./client": {
       "types": "./dist/client/index.d.ts",
       "default": "./dist/client/index.js"
+    },
+    "./shared": {
+      "types": "./dist/shared/index.d.ts",
+      "default": "./dist/shared/index.js"
     }
   },
   "scripts": {
@@ -34,5 +38,8 @@
     "glob": "^13.0.6",
     "typescript": "^7.0.2"
   },
-  "files":["dist", "README.md"]
+  "files": [
+    "dist",
+    "README.md"
+  ]
 }
