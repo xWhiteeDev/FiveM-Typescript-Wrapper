@@ -1,13 +1,12 @@
-import { Vector3 } from '../Math/Vector3';
 import { IVector3 } from '../typings/Vector3';
 import { IVehicleOptions } from '../typings/Vehicle';
 import { Utils } from '../Utils/Utils';
-import {BaseEntity} from './BaseEntity';
+import { BaseEntity } from './BaseEntity';
 import { Ped } from './Ped';
 
-export class Vehicle extends BaseEntity{
+export class Vehicle extends BaseEntity {
   private constructor(protected _handle: number) {
-    super(_handle)
+    super(_handle);
   }
   static async create(model: string, coords: IVector3, optional?: IVehicleOptions): Promise<Vehicle | undefined> {
     const hashKey = GetHashKey(model);
@@ -327,11 +326,11 @@ export class Vehicle extends BaseEntity{
     return GetVehicleHornSoundIndex(this._handle);
   }
 
-  isAudiblyDamaged(): boolean {
+  get isAudiblyDamaged(): boolean {
     return IsVehicleAudiblyDamaged(this._handle);
   }
 
-  isRadioOn(): boolean {
+  get isRadioOn(): boolean {
     return IsVehicleRadioOn(this._handle);
   }
 
@@ -678,11 +677,11 @@ export class Vehicle extends BaseEntity{
     return GetCanVehicleJump(this._handle);
   }
 
-  getConvertibleRoofState(): number {
+  get convertibleRoofState(): number {
     return GetConvertibleRoofState(this._handle);
   }
 
-  getCurrentPlaybackForVehicle(): number {
+  get currentPlaybackForVehicle(): number {
     return GetCurrentPlaybackForVehicle(this._handle);
   }
 
@@ -694,32 +693,77 @@ export class Vehicle extends BaseEntity{
     return GetDoesVehicleHaveTombstone(this._handle);
   }
 
-  getEntryPositionOfDoor(doorIndex: number): Vector3 {
+  getEntryPositionOfDoor(doorIndex: number): IVector3 {
     const [x, y, z] = GetEntryPositionOfDoor(this._handle, doorIndex);
     return { x, y, z };
   }
 
-  hasRetractableWheels(): boolean {
+  get hasRetractableWheels(): boolean {
     return GetHasRetractableWheels(this._handle);
   }
 
-  hasRocketBoost(): boolean {
+  get hasRocketBoost(): boolean {
     return GetHasRocketBoost(this._handle);
   }
 
-  isBoatCapsized(): boolean {
+  get isBoatCapsized(): boolean {
     return GetIsBoatCapsized(this._handle);
   }
 
   isDoorValid(doorIndex: number): boolean {
     return GetIsDoorValid(this._handle, doorIndex);
   }
+  get trackBrakingDistance(): number {
+    return GetTrackBrakingDistance(this._handle);
+  }
 
-  isLeftVehicleHeadlightDamaged(): boolean {
+  get trackMaxSpeed(): number {
+    return GetTrackMaxSpeed(this._handle);
+  }
+
+  getTrackNodeCoords(trackNode: number): number[] {
+    return GetTrackNodeCoords(this._handle, trackNode)[1];
+  }
+
+  get trackNodeCount(): number {
+    return GetTrackNodeCount(this._handle);
+  }
+  get trainCruiseSpeed(): number {
+    return GetTrainCruiseSpeed(this._handle);
+  }
+
+  get trainCurrentTrackNode(): number {
+    return GetTrainCurrentTrackNode(this._handle);
+  }
+
+  get isTrainMovingForward(): boolean {
+    return GetTrainDirection(this._handle);
+  }
+
+  get trainDoorCount(): number {
+    return GetTrainDoorCount(this._handle);
+  }
+
+  getTrainDoorOpenRatio(doorIndex: number): number {
+    return GetTrainDoorOpenRatio(this._handle, doorIndex);
+  }
+
+  get trainSpeed(): number {
+    return GetTrainSpeed(this._handle);
+  }
+
+  get trainState(): number {
+    return GetTrainState(this._handle);
+  }
+
+  get trainTrackIndex(): number {
+    return GetTrainTrackIndex(this._handle);
+  }
+  get isLeftVehicleHeadlightDamaged(): boolean {
     return GetIsLeftVehicleHeadlightDamaged(this._handle);
   }
 
-  isRightVehicleHeadlightDamaged(): boolean {
+  get isRightVehicleHeadlightDamaged(): boolean {
     return GetIsRightVehicleHeadlightDamaged(this._handle);
   }
 
@@ -727,27 +771,27 @@ export class Vehicle extends BaseEntity{
     return GetIsVehicleElectric(vehicleModel);
   }
 
-  isVehicleEmpDisabled(): boolean {
+  get isVehicleEmpDisabled(): boolean {
     return GetIsVehicleEmpDisabled(this._handle);
   }
 
-  isVehicleEngineRunning(): boolean {
+  get isVehicleEngineRunning(): boolean {
     return GetIsVehicleEngineRunning(this._handle);
   }
 
-  isVehiclePrimaryColourCustom(): boolean {
+  get isVehiclePrimaryColourCustom(): boolean {
     return GetIsVehiclePrimaryColourCustom(this._handle);
   }
 
-  isVehicleSecondaryColourCustom(): boolean {
+ get  isVehicleSecondaryColourCustom(): boolean {
     return GetIsVehicleSecondaryColourCustom(this._handle);
   }
 
-  isVehicleShuntBoostActive(): boolean {
+  get isVehicleShuntBoostActive(): boolean {
     return GetIsVehicleShuntBoostActive(this._handle);
   }
 
-  getLandingGearState(): number {
+  get landingGearState(): number {
     return GetLandingGearState(this._handle);
   }
 
@@ -756,7 +800,7 @@ export class Vehicle extends BaseEntity{
     return new Ped(handlePed);
   }
 
-  getLastRammedVehicle(): Vehicle {
+  get lastRammedVehicle(): Vehicle {
     return Vehicle.fromHandle(GetLastRammedVehicle(this._handle));
   }
 
@@ -771,20 +815,78 @@ export class Vehicle extends BaseEntity{
   getModTextLabel(modType: number, modValue: number): string {
     return GetModTextLabel(this._handle, modType, modValue);
   }
+  get fuelConsumptionRateMultiplier(): number {
+    return GetFuelConsumptionRateMultiplier();
+  }
+
+  get fuelConsumptionState(): boolean {
+    return GetFuelConsumptionState();
+  }
+  get globalPassengerMassMultiplier(): number {
+    return GetGlobalPassengerMassMultiplier();
+  }
+
+  get vehicleDashboardBoost(): number {
+    return GetVehicleDashboardBoost();
+  }
+
+  get vehicleDashboardColour(): number {
+    return GetVehicleDashboardColour(this._handle);
+  }
+
+  get vehicleDashboardCurrentGear(): number {
+    return GetVehicleDashboardCurrentGear();
+  }
+
+  get vehicleDashboardFuel(): number {
+    return GetVehicleDashboardFuel();
+  }
+
+  get vehicleDashboardLights(): number {
+    return GetVehicleDashboardLights();
+  }
+
+  get vehicleDashboardOilPressure(): number {
+    return GetVehicleDashboardOilPressure();
+  }
+
+  get vehicleDashboardOilTemp(): number {
+    return GetVehicleDashboardOilTemp();
+  }
+
+  get vehicleDashboardRpm(): number {
+    return GetVehicleDashboardRpm();
+  }
+
+  get vehicleDashboardSpeed(): number {
+    return GetVehicleDashboardSpeed(this._handle);
+  }
+
+  get vehicleDashboardTemp(): number {
+    return GetVehicleDashboardTemp();
+  }
+
+  get vehicleDashboardVacuum(): number {
+    return GetVehicleDashboardVacuum();
+  }
+
+  get vehicleDensityMultiplier(): number {
+    return GetVehicleDensityMultiplier();
+  }
 
   getNumVehicleMods(modType: number): number {
     return GetNumVehicleMods(this._handle, modType);
   }
 
-  getNumberOfVehicleColours(): number {
+  get numberOfVehicleColours(): number {
     return GetNumberOfVehicleColours(this._handle);
   }
 
-  getNumberOfVehicleDoors(): number {
+  get numberOfVehicleDoors(): number {
     return GetNumberOfVehicleDoors(this._handle);
   }
 
-  static getNumberOfVehicleNumberPlates(): number {
+  static get numberOfVehicleNumberPlates(): number {
     return GetNumberOfVehicleNumberPlates();
   }
 
@@ -796,19 +898,19 @@ export class Vehicle extends BaseEntity{
     return new Ped(GetPedUsingVehicleDoor(this._handle, doorIndex));
   }
 
-  getPositionInRecording(): number {
+  get positionInRecording(): number {
     return GetPositionInRecording(this._handle);
   }
 
-  getRemainingNitrousDuration(): number {
+  get remainingNitrousDuration(): number {
     return GetRemainingNitrousDuration(this._handle);
   }
 
-  getTimePositionInRecording(): number {
+  get timePositionInRecording(): number {
     return GetTimePositionInRecording(this._handle);
   }
 
-  getVehicleAcceleration(): number {
+  get vehicleAcceleration(): number {
     return GetVehicleAcceleration(this._handle);
   }
 
@@ -816,7 +918,7 @@ export class Vehicle extends BaseEntity{
     return Vehicle.fromHandle(GetVehicleAttachedToCargobob(cargobob._handle));
   }
 
-  getVehicleBodyHealth(): number {
+  get vehicleBodyHealth(): number {
     return GetVehicleBodyHealth(this._handle);
   }
 
@@ -824,15 +926,15 @@ export class Vehicle extends BaseEntity{
     return GetVehicleBombCount(aircraft._handle);
   }
 
-  getVehicleCanActivateParachute(): boolean {
+  get vehicleCanActivateParachute(): boolean {
     return GetVehicleCanActivateParachute(this._handle);
   }
 
-  getVehicleCauseOfDestruction(): number {
+  get vehicleCauseOfDestruction(): number {
     return GetVehicleCauseOfDestruction(this._handle);
   }
 
-  getVehicleClass(): number {
+  get vehicleClass(): number {
     return GetVehicleClass(this._handle);
   }
 
@@ -860,19 +962,19 @@ export class Vehicle extends BaseEntity{
     return GetVehicleClassMaxTraction(vehicleClass);
   }
 
-  getVehicleColor(): [number, number, number] {
+  get vehicleColor(): [number, number, number] {
     return GetVehicleColor(this._handle);
   }
 
-  getVehicleColourCombination(): number {
+  get vehicleColourCombination(): number {
     return GetVehicleColourCombination(this._handle);
   }
 
-  getVehicleColours(): [number, number] {
+  get vehicleColours(): [number, number] {
     return GetVehicleColours(this._handle);
   }
 
-  getVehicleColoursWhichCanBeSet(): number {
+  get vehicleColoursWhichCanBeSet(): number {
     return GetVehicleColoursWhichCanBeSet(this._handle);
   }
 
@@ -880,27 +982,27 @@ export class Vehicle extends BaseEntity{
     return GetVehicleCountermeasureCount(aircraft._handle);
   }
 
-  getVehicleCurrentSlipstreamDraft(): number {
+  get vehicleCurrentSlipstreamDraft(): number {
     return GetVehicleCurrentSlipstreamDraft(this._handle);
   }
 
-  getVehicleCustomPrimaryColour(): [number, number, number] {
+  get vehicleCustomPrimaryColour(): [number, number, number] {
     return GetVehicleCustomPrimaryColour(this._handle);
   }
 
-  getVehicleCustomSecondaryColour(): [number, number, number] {
+  get vehicleCustomSecondaryColour(): [number, number, number] {
     return GetVehicleCustomSecondaryColour(this._handle);
   }
 
-  getVehicleDashboardColor(): number {
+  get vehicleDashboardColor(): number {
     return GetVehicleDashboardColor(this._handle);
   }
 
-  getVehicleDeformationAtPos(offsetX: number, offsetY: number, offsetZ: number): Vector3 {
+  getVehicleDeformationAtPos(offsetX: number, offsetY: number, offsetZ: number): IVector3 {
     const [x, y, z] = GetVehicleDeformationAtPos(this._handle, offsetX, offsetY, offsetZ);
     return { x, y, z };
   }
-  getVehicleDirtLevel(): number {
+  get vehicleDirtLevel(): number {
     return GetVehicleDirtLevel(this._handle);
   }
 
@@ -908,11 +1010,11 @@ export class Vehicle extends BaseEntity{
     return GetVehicleDoorAngleRatio(this._handle, doorIndex);
   }
 
-  getVehicleDoorLockStatus(): number {
+  get vehicleDoorLockStatus(): number {
     return GetVehicleDoorLockStatus(this._handle);
   }
 
-  getDoorsLockedForPlayer(): boolean {
+  get doorsLockedForPlayer(): boolean {
     return GetVehicleDoorsLockedForPlayer(this._handle, PlayerId());
   }
 
@@ -920,19 +1022,19 @@ export class Vehicle extends BaseEntity{
     return GetVehicleDrivetrainType(vehicleModel);
   }
 
-  getVehicleEngineHealth(): number {
+  get vehicleEngineHealth(): number {
     return GetVehicleEngineHealth(this._handle);
   }
 
-  getVehicleEnveffScale(): number {
+  get vehicleEnveffScale(): number {
     return GetVehicleEnveffScale(this._handle);
   }
 
-  getVehicleEstimatedMaxSpeed(): number {
+  get vehicleEstimatedMaxSpeed(): number {
     return GetVehicleEstimatedMaxSpeed(this._handle);
   }
 
-  getVehicleExtraColours(): [number, number] {
+  get vehicleExtraColours(): [number, number] {
     return GetVehicleExtraColours(this._handle);
   }
 
@@ -940,19 +1042,19 @@ export class Vehicle extends BaseEntity{
     return GetVehicleFlightNozzlePosition(aircraft.handle);
   }
 
-  getVehicleHaskers(): boolean {
+  get vehicleHaskers(): boolean {
     return GetVehicleHasKers(this._handle);
   }
 
-  getVehicleHasParachute(): boolean {
+  get vehicleHasParachute(): boolean {
     return GetVehicleHasParachute(this._handle);
   }
 
-  getVehicleHealthPercentage(): number {
+  get vehicleHealthPercentage(): number {
     return GetVehicleHealthPercentage(this._handle);
   }
 
-  getVehicleHomingLockonState(): number {
+  get vehicleHomingLockonState(): number {
     return GetVehicleHomingLockonState(this._handle);
   }
 
@@ -960,43 +1062,43 @@ export class Vehicle extends BaseEntity{
     return GetVehicleIndividualDoorLockStatus(this._handle, doorIndex);
   }
 
-  getVehicleInteriorColor(): number {
+  get vehicleInteriorColor(): number {
     return GetVehicleInteriorColor(this._handle);
   }
 
-  isVehicleMercenary(): boolean {
+  get isVehicleMercenary(): boolean {
     return GetVehicleIsMercenary(this._handle);
   }
 
-  getVehicleLayoutHash(): number {
+  get vehicleLayoutHash(): number {
     return GetVehicleLayoutHash(this._handle);
   }
 
-  getVehicleLightsState(): [boolean, any, any] {
+  get vehicleLightsState(): [boolean, any, any] {
     return GetVehicleLightsState(this._handle);
   }
 
-  getVehicleLivery(): number {
+  get vehicleLivery(): number {
     return GetVehicleLivery(this._handle);
   }
 
-  getVehicleLiveryCount(): number {
+  get vehicleLiveryCount(): number {
     return GetVehicleLiveryCount(this._handle);
   }
 
-  getVehicleLockOnTarget(): Vehicle {
+  get vehicleLockOnTarget(): Vehicle {
     return Vehicle.fromHandle(GetVehicleLockOnTarget(this._handle)[1]);
   }
 
-  getVehicleMaxBraking(): number {
+  get vehicleMaxBraking(): number {
     return GetVehicleMaxBraking(this._handle);
   }
 
-  getVehicleMaxNumberOfPassengers(): number {
+  get vehicleMaxNumberOfPassengers(): number {
     return GetVehicleMaxNumberOfPassengers(this._handle);
   }
 
-  getVehicleMaxTraction(): number {
+  get vehicleMaxTraction(): number {
     return GetVehicleMaxTraction(this._handle);
   }
 
@@ -1004,7 +1106,7 @@ export class Vehicle extends BaseEntity{
     return GetVehicleMod(this._handle, modType);
   }
 
-  getVehicleModColor_1(): [number, number, number] {
+  get vehicleModColor_1(): [number, number, number] {
     return GetVehicleModColor_1(this._handle);
   }
 
@@ -1012,11 +1114,11 @@ export class Vehicle extends BaseEntity{
     return GetVehicleModColor_1Name(this._handle, p1);
   }
 
-  getVehicleModColor_2(): [number, number] {
+  get vehicleModColor_2(): [number, number] {
     return GetVehicleModColor_2(this._handle);
   }
 
-  getVehicleModColor_2Name(): string {
+  get vehicleModColor_2Name(): string {
     return GetVehicleModColor_2Name(this._handle);
   }
 
@@ -1024,11 +1126,11 @@ export class Vehicle extends BaseEntity{
     return GetVehicleModIdentifierHash(this._handle, modType, modIndex);
   }
 
-  getVehicleModKit(): number {
+  get vehicleModKit(): number {
     return GetVehicleModKit(this._handle);
   }
 
-  getVehicleModKitType(): number {
+  get vehicleModKitType(): number {
     return GetVehicleModKitType(this._handle);
   }
 
@@ -1076,63 +1178,63 @@ export class Vehicle extends BaseEntity{
     return GetVehicleModelValue(vehicleModel);
   }
 
-  getVehicleNeonLightsColour(): [number, number, number] {
+  get vehicleNeonLightsColour(): [number, number, number] {
     return GetVehicleNeonLightsColour(this._handle);
   }
 
-  getVehicleNumberOfBrokenBones(): number {
+  get vehicleNumberOfBrokenBones(): number {
     return GetVehicleNumberOfBrokenBones(this._handle);
   }
 
-  getVehicleNumberOfBrokenOffBones(): number {
+  get vehicleNumberOfBrokenOffBones(): number {
     return GetVehicleNumberOfBrokenOffBones(this._handle);
   }
-  getVehicleNumberOfPassengers(): number {
+  get vehicleNumberOfPassengers(): number {
     return GetVehicleNumberOfPassengers(this._handle);
   }
 
-  getVehicleNumberPlateText(): string {
+  get vehicleNumberPlateText(): string {
     return GetVehicleNumberPlateText(this._handle);
   }
 
-  getVehicleNumberPlateTextIndex(): number {
+  get vehicleNumberPlateTextIndex(): number {
     return GetVehicleNumberPlateTextIndex(this._handle);
   }
 
-  getVehiclePetrolTankHealth(): number {
+  get vehiclePetrolTankHealth(): number {
     return GetVehiclePetrolTankHealth(this._handle);
   }
 
-  getVehiclePlateType(): number {
+  get vehiclePlateType(): number {
     return GetVehiclePlateType(this._handle);
   }
 
-  getVehicleRoofLivery(): number {
+  get vehicleRoofLivery(): number {
     return GetVehicleRoofLivery(this._handle);
   }
 
-  getVehicleRoofLiveryCount(): number {
+  get vehicleRoofLiveryCount(): number {
     return GetVehicleRoofLiveryCount(this._handle);
   }
 
-  getVehicleSuspensionBounds(): [Vector3, Vector3[]] {
+  get vehicleSuspensionBounds(): [IVector3, IVector3[]] {
     const [[x, y, z], [x2, y2, z2]] = GetVehicleSuspensionBounds(this._handle);
-    return [{ x, y, z }, [{ x:x2, y:y2, z:z2 }]];
+    return [{ x, y, z }, [{ x: x2, y: y2, z: z2 }]];
   }
 
-  getVehicleSuspensionHeight(): number {
+  get vehicleSuspensionHeight(): number {
     return GetVehicleSuspensionHeight(this._handle);
   }
 
-  getVehicleTrailerVehicle(): Vehicle {
+  get vehicleTrailerVehicle(): Vehicle {
     return Vehicle.fromHandle(GetVehicleTrailerVehicle(this._handle)[1]);
   }
 
-  getVehicleTyreSmokeColor(): [number,number,number] {
-  return  GetVehicleTyreSmokeColor(this._handle);
+  get vehicleTyreSmokeColor(): [number, number, number] {
+    return GetVehicleTyreSmokeColor(this._handle);
   }
 
-  getVehicleTyresCanBurst(): boolean {
+  get vehicleTyresCanBurst(): boolean {
     return GetVehicleTyresCanBurst(this._handle);
   }
 
@@ -1140,15 +1242,15 @@ export class Vehicle extends BaseEntity{
     return GetVehicleWeaponRestrictedAmmo(this._handle, weaponIndex);
   }
 
-  getVehicleWheelType(): number {
+  get vehicleWheelType(): number {
     return GetVehicleWheelType(this._handle);
   }
 
-  getVehicleWindowTint(): number {
+  get vehicleWindowTint(): number {
     return GetVehicleWindowTint(this._handle);
   }
 
-  getVehicleXenonLightsColor(): number {
+  get vehicleXenonLightsColor(): number {
     return GetVehicleXenonLightsColor(this._handle);
   }
 
@@ -1160,7 +1262,7 @@ export class Vehicle extends BaseEntity{
     HideVehicleTombstone(this._handle, toggle);
   }
 
-  isAnyPedRappellingFromHeli(): boolean {
+  get isAnyPedRappellingFromHeli(): boolean {
     return IsAnyPedRappellingFromHeli(this._handle);
   }
 
@@ -1168,7 +1270,7 @@ export class Vehicle extends BaseEntity{
     return IsAnyVehicleNearPoint(x, y, z, radius);
   }
 
-  isBigVehicle(): boolean {
+  get isBigVehicle(): boolean {
     return IsBigVehicle(this._handle);
   }
 
@@ -1176,7 +1278,7 @@ export class Vehicle extends BaseEntity{
     return IsEntityAttachedToHandlerFrame(this._handle, entityHandle);
   }
 
-  isNitrousActive(): boolean {
+  get isNitrousActive(): boolean {
     return IsNitrousActive(this._handle);
   }
 
@@ -1184,11 +1286,11 @@ export class Vehicle extends BaseEntity{
     return IsPlaneLandingGearIntact(plane.handle);
   }
 
-  isPlaybackGoingOnForVehicle(): boolean {
+  get isPlaybackGoingOnForVehicle(): boolean {
     return IsPlaybackGoingOnForVehicle(this._handle);
   }
 
-  isPlaybackUsingAiGoingOnForVehicle(): boolean {
+  get isPlaybackUsingAiGoingOnForVehicle(): boolean {
     return IsPlaybackUsingAiGoingOnForVehicle(this._handle);
   }
 
@@ -1196,7 +1298,7 @@ export class Vehicle extends BaseEntity{
     return IsVehicleAConvertible(this._handle, checkRoofExtras);
   }
 
-  isVehicleAlarmActivated(): boolean {
+  get isVehicleAlarmActivated(): boolean {
     return IsVehicleAlarmActivated(this._handle);
   }
 
@@ -1208,11 +1310,11 @@ export class Vehicle extends BaseEntity{
     return IsVehicleAttachedToTowTruck(towTruck.handle, vehicle.handle);
   }
 
-  isVehicleAttachedToTrailer(): boolean {
+  get isVehicleAttachedToTrailer(): boolean {
     return IsVehicleAttachedToTrailer(this._handle);
   }
 
-  isVehicleBeingHalted(): boolean {
+  get isVehicleBeingHalted(): boolean {
     return IsVehicleBeingHalted(this._handle);
   }
 
@@ -1224,7 +1326,7 @@ export class Vehicle extends BaseEntity{
     return IsVehicleBumperBrokenOff(this._handle, front);
   }
 
-  isVehicleDamaged(): boolean {
+  get isVehicleDamaged(): boolean {
     return IsVehicleDamaged(this._handle);
   }
 
@@ -1240,7 +1342,7 @@ export class Vehicle extends BaseEntity{
     return IsVehicleDriveable(this._handle, isOnFireCheck);
   }
 
-  isVehicleEngineOnFire(): boolean {
+  get isVehicleEngineOnFire(): boolean {
     return IsVehicleEngineOnFire(this._handle);
   }
 
@@ -1248,11 +1350,11 @@ export class Vehicle extends BaseEntity{
     return IsVehicleExtraTurnedOn(this._handle, extraId);
   }
 
-  isVehicleHighDetail(): boolean {
+  get isVehicleHighDetail(): boolean {
     return IsVehicleHighDetail(this._handle);
   }
 
-  isVehicleInBurnout(): boolean {
+  get isVehicleInBurnout(): boolean {
     return IsVehicleInBurnout(this._handle);
   }
 
@@ -1260,7 +1362,7 @@ export class Vehicle extends BaseEntity{
     return IsVehicleInGarageArea(garageName, vehicle.handle);
   }
 
-  isVehicleInSubmarineMode(): boolean {
+  get isVehicleInSubmarineMode(): boolean {
     return IsVehicleInSubmarineMode(this._handle);
   }
 
@@ -1276,23 +1378,23 @@ export class Vehicle extends BaseEntity{
     return IsVehicleNeonLightEnabled(this._handle, index);
   }
 
-  isVehicleOnAllWheels(): boolean {
+  get isVehicleOnAllWheels(): boolean {
     return IsVehicleOnAllWheels(this._handle);
   }
 
-  isVehicleOnBoostPad(): boolean {
+  get isVehicleOnBoostPad(): boolean {
     return IsVehicleOnBoostPad(this._handle);
   }
 
-  isVehicleParachuteActive(): boolean {
+  get isVehicleParachuteActive(): boolean {
     return IsVehicleParachuteActive(this._handle);
   }
 
-  isVehicleRocketBoostActive(): boolean {
+  get isVehicleRocketBoostActive(): boolean {
     return IsVehicleRocketBoostActive(this._handle);
   }
 
-  isVehicleSearchlightOn(): boolean {
+  get isVehicleSearchlightOn(): boolean {
     return IsVehicleSearchlightOn(this._handle);
   }
 
@@ -1300,35 +1402,35 @@ export class Vehicle extends BaseEntity{
     return IsVehicleSeatFree(this._handle, seatIndex);
   }
 
-  isVehicleSirenAudioOn(): boolean {
+  get isVehicleSirenAudioOn(): boolean {
     return IsVehicleSirenAudioOn(this._handle);
   }
 
-  isVehicleSirenOn(): boolean {
+  get isVehicleSirenOn(): boolean {
     return IsVehicleSirenOn(this._handle);
   }
 
-  isVehicleSlipstreamLeader(): boolean {
+  get isVehicleSlipstreamLeader(): boolean {
     return IsVehicleSlipstreamLeader(this._handle);
   }
 
-  isVehicleSprayable(): boolean {
+  get isVehicleSprayable(): boolean {
     return IsVehicleSprayable(this._handle);
   }
 
-  isVehicleStolen(): boolean {
+  get isVehicleStolen(): boolean {
     return IsVehicleStolen(this._handle);
   }
 
-  isVehicleStopped(): boolean {
+  get isVehicleStopped(): boolean {
     return IsVehicleStopped(this._handle);
   }
 
-  isVehicleStoppedAtTrafficLights(): boolean {
+  get isVehicleStoppedAtTrafficLights(): boolean {
     return IsVehicleStoppedAtTrafficLights(this._handle);
   }
 
-  isVehicleStuckOnRoof(): boolean {
+  get isVehicleStuckOnRoof(): boolean {
     return IsVehicleStuckOnRoof(this._handle);
   }
 
@@ -1340,7 +1442,7 @@ export class Vehicle extends BaseEntity{
     return IsVehicleTyreBurst(this._handle, wheelID, isBurstToRim);
   }
 
-  isVehicleVisible(): boolean {
+  get isVehicleVisible(): boolean {
     return IsVehicleVisible(this._handle);
   }
 
@@ -1826,7 +1928,7 @@ export class Vehicle extends BaseEntity{
     SetVehicleDoorsLockedForNonScriptPlayers(this._handle, toggle);
   }
 
-  setVehicleDoorsLockedForPlayer( toggle: boolean): void {
+  setVehicleDoorsLockedForPlayer(toggle: boolean): void {
     SetVehicleDoorsLockedForPlayer(this._handle, PlayerId(), toggle);
   }
 
@@ -2345,5 +2447,771 @@ export class Vehicle extends BaseEntity{
 
   unpausePlaybackRecordedVehicle(): void {
     UnpausePlaybackRecordedVehicle(this._handle);
+  }
+
+  static addRoadNodeSpeedZone(x: number, y: number, z: number, radius: number, speed: number, p5: boolean): number {
+    return AddRoadNodeSpeedZone(x, y, z, radius, speed, p5);
+  }
+
+  static addVehicleCombatAngledAvoidanceArea(p0: number, p1: number, p2: number, p3: number, p4: number, p5: number, p6: number): any {
+    return AddVehicleCombatAngledAvoidanceArea(p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  static addVehicleStuckCheckWithWarp(p0: any, p1: number, p2: any, p3: boolean, p4: boolean, p5: boolean, p6: any): void {
+    AddVehicleStuckCheckWithWarp(p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  areBombBayDoorsOpen(): boolean {
+    return AreBombBayDoorsOpen(this._handle);
+  }
+
+  areHeliStubWingsDeployed(): boolean {
+    return AreHeliStubWingsDeployed(this._handle);
+  }
+
+  arePlaneControlPanelsIntact(checkForZeroHealth: boolean): boolean {
+    return ArePlaneControlPanelsIntact(this._handle, checkForZeroHealth);
+  }
+
+  arePlanePropellersIntact(): boolean {
+    return ArePlanePropellersIntact(this._handle);
+  }
+
+  attachContainerToHandlerFrame(container: number): void {
+    AttachContainerToHandlerFrame(this._handle, container);
+  }
+
+  attachEntityToCargobob(entity: number, p2: number, x: number, y: number, z: number): void {
+    AttachEntityToCargobob(this._handle, entity, p2, x, y, z);
+  }
+
+  canAnchorBoatHere(): boolean {
+    return CanAnchorBoatHere(this._handle);
+  }
+
+  canAnchorBoatHereIgnorePlayers(): boolean {
+    return CanAnchorBoatHereIgnorePlayers(this._handle);
+  }
+
+  canCargobobPickUpEntity(entity: number): boolean {
+    return CanCargobobPickUpEntity(this._handle, entity);
+  }
+
+  canShuffleSeat(seatIndex: number): boolean {
+    return CanShuffleSeat(this._handle, seatIndex);
+  }
+
+  static clearLastDrivenVehicle(): void {
+    ClearLastDrivenVehicle();
+  }
+
+  static clearVehicleGeneratorAreaOfInterest(): void {
+    ClearVehicleGeneratorAreaOfInterest();
+  }
+
+  static clearVehiclePhoneExplosiveDevice(): void {
+    ClearVehiclePhoneExplosiveDevice();
+  }
+
+  closeBombBayDoors(): void {
+    CloseBombBayDoors(this._handle);
+  }
+
+  static createMissionTrain(variation: number, x: number, y: number, z: number, direction: boolean): Vehicle {
+    return Vehicle.fromHandle(CreateMissionTrain(variation, x, y, z, direction));
+  }
+
+  createPickUpRopeForCargobob(state: number): void {
+    CreatePickUpRopeForCargobob(this._handle, state);
+  }
+
+  static createScriptVehicleGenerator(x: number, y: number, z: number, heading: number, p4: number, p5: number, modelHash: number, p7: number, p8: number, p9: number, p10: number, p11: boolean, p12: boolean, p13: boolean, p14: boolean, p15: boolean, p16: number): number {
+    return CreateScriptVehicleGenerator(x, y, z, heading, p4, p5, modelHash, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16);
+  }
+
+  static deleteAllTrains(): void {
+    DeleteAllTrains();
+  }
+
+  deleteMissionTrain(): void {
+    DeleteMissionTrain(this._handle);
+  }
+
+  static deleteScriptVehicleGenerator(vehicleGenerator: number): void {
+    DeleteScriptVehicleGenerator(vehicleGenerator);
+  }
+
+  deleteVehicle(): void {
+    DeleteVehicle(this._handle);
+  }
+
+  detachContainerFromHandlerFrame(): void {
+    DetachContainerFromHandlerFrame(this._handle);
+  }
+
+  detachEntityFromCargobob(entity: number): any {
+    return DetachEntityFromCargobob(this._handle, entity);
+  }
+
+  static detonateVehiclePhoneExplosiveDevice(): void {
+    DetonateVehiclePhoneExplosiveDevice();
+  }
+
+  disableIndividualPlanePropeller(propeller: number): void {
+    DisableIndividualPlanePropeller(this._handle, propeller);
+  }
+
+  disablePlaneAileron(p1: boolean, p2: boolean): void {
+    DisablePlaneAileron(this._handle, p1, p2);
+  }
+
+  static disableVehicleWeapon(disabled: boolean, weaponHash: number, vehicle: Vehicle, owner: Ped): void {
+    DisableVehicleWeapon(disabled, weaponHash, vehicle.handle, owner.handle);
+  }
+
+  doesCargobobHavePickUpRope(): boolean {
+    return DoesCargobobHavePickUpRope(this._handle);
+  }
+
+  doesCargobobHavePickupMagnet(): boolean {
+    return DoesCargobobHavePickupMagnet(this._handle);
+  }
+
+  static doesScriptVehicleGeneratorExist(vehicleGenerator: number): boolean {
+    return DoesScriptVehicleGeneratorExist(vehicleGenerator);
+  }
+
+  ejectJb700Roof(x: number, y: number, z: number): void {
+    EjectJb700Roof(this._handle, x, y, z);
+  }
+
+  enableIndividualPlanePropeller(propeller: number): void {
+    EnableIndividualPlanePropeller(this._handle, propeller);
+  }
+
+  static findRandomPointInSpace(ped: Ped): IVector3 {
+    const [x, y, z] = FindRandomPointInSpace(ped.handle);
+    return { x, y, z };
+  }
+
+  static findVehicleCarryingThisEntity(entity: number): Vehicle {
+    return Vehicle.fromHandle(FindVehicleCarryingThisEntity(entity));
+  }
+
+  forceSubmarineNeurtalBuoyancy(time: number): void {
+    ForceSubmarineNeurtalBuoyancy(this._handle, time);
+  }
+
+  forceSubmarineSurfaceMode(toggle: boolean): void {
+    ForceSubmarineSurfaceMode(this._handle, toggle);
+  }
+
+  static get allVehicles(): [number, unknown] {
+    return GetGamePool('CVehicle');
+  }
+
+  get boatBoomPositionRatio(): number {
+    return GetBoatBoomPositionRatio(this._handle);
+  }
+
+  getBoatBoomPositionRatio_3(p1: boolean): void {
+    GetBoatBoomPositionRatio_3(this._handle, p1);
+  }
+
+  static getBoatVehicleModelAgility(modelHash: number): number {
+    return GetBoatVehicleModelAgility(modelHash);
+  }
+
+  get cargobobHookPosition(): IVector3 {
+    const [x, y, z] = GetCargobobHookPosition(this._handle);
+    return { x, y, z };
+  }
+
+  static getClosestVehicle(x: number, y: number, z: number, radius: number, modelHash: number, flags: number): Vehicle {
+    return Vehicle.fromHandle(GetClosestVehicle(x, y, z, radius, modelHash, flags));
+  }
+
+  get driftTyresEnabled(): boolean {
+    return GetDriftTyresEnabled(this._handle);
+  }
+
+  get entityAttachedToCargobob(): number {
+    return GetEntityAttachedToCargobob(this._handle);
+  }
+
+  get entityAttachedToTowTruck(): number {
+    return GetEntityAttachedToTowTruck(this._handle);
+  }
+
+  get heliMainRotorHealth(): number {
+    return GetHeliMainRotorHealth(this._handle);
+  }
+
+  get heliTailBoomHealth(): number {
+    return GetHeliTailBoomHealth(this._handle);
+  }
+
+  get heliTailRotorHealth(): number {
+    return GetHeliTailRotorHealth(this._handle);
+  }
+
+  getHydraulicWheelValue(wheelId: number): number {
+    return GetHydraulicWheelValue(this._handle, wheelId);
+  }
+
+  get isWheelsLoweredStateActive(): boolean {
+    return GetIsWheelsLoweredStateActive(this._handle);
+  }
+
+  static get lastDrivenVehicle(): Vehicle {
+    return Vehicle.fromHandle(GetLastDrivenVehicle());
+  }
+
+  getModSlotName(modType: number): string {
+    return GetModSlotName(this._handle, modType);
+  }
+
+  static getNumModColors(paintType: number, p1: boolean): number {
+    return GetNumModColors(paintType, p1);
+  }
+
+  get numModKits(): number {
+    return GetNumModKits(this._handle);
+  }
+
+  static get numVehicleWindowTints(): number {
+    return GetNumVehicleWindowTints();
+  }
+
+  static getPositionOfVehicleRecordingAtTime(recording: number, time: number, script: string): IVector3 {
+    const [x, y, z] = GetPositionOfVehicleRecordingAtTime(recording, time, script);
+    return { x, y, z };
+  }
+
+  static getPositionOfVehicleRecordingIdAtTime(id: number, time: number): IVector3 {
+    const [x, y, z] = GetPositionOfVehicleRecordingIdAtTime(id, time);
+    return { x, y, z };
+  }
+
+  static getRandomVehicleBackBumperInSphere(p0: number, p1: number, p2: number, p3: number, p4: number, p5: number, p6: number): Vehicle {
+    return Vehicle.fromHandle(GetRandomVehicleBackBumperInSphere(p0, p1, p2, p3, p4, p5, p6));
+  }
+
+  static getRandomVehicleFrontBumperInSphere(p0: number, p1: number, p2: number, p3: number, p4: number, p5: number, p6: number): Vehicle {
+    return Vehicle.fromHandle(GetRandomVehicleFrontBumperInSphere(p0, p1, p2, p3, p4, p5, p6));
+  }
+
+  static getRandomVehicleInSphere(x: number, y: number, z: number, radius: number, modelHash: number, flags: number): Vehicle {
+    return Vehicle.fromHandle(GetRandomVehicleInSphere(x, y, z, radius, modelHash, flags));
+  }
+
+  static getRandomVehicleModelInMemory(p0: boolean): [any, any] {
+    return GetRandomVehicleModelInMemory(p0);
+  }
+
+  static getRotationOfVehicleRecordingAtTime(recording: number, time: number, script: string): IVector3 {
+    const [x, y, z] = GetRotationOfVehicleRecordingAtTime(recording, time, script);
+    return { x, y, z };
+  }
+
+  static getRotationOfVehicleRecordingIdAtTime(id: number, time: number): IVector3 {
+    const [x, y, z] = GetRotationOfVehicleRecordingIdAtTime(id, time);
+    return { x, y, z };
+  }
+
+  get submarineIsUnderDesignDepth(): boolean {
+    return GetSubmarineIsUnderDesignDepth(this._handle);
+  }
+
+  get submarineNumberOfAirLeaks(): number {
+    return GetSubmarineNumberOfAirLeaks(this._handle);
+  }
+
+  static getTotalDurationOfVehicleRecording(recording: number, script: string): number {
+    return GetTotalDurationOfVehicleRecording(recording, script);
+  }
+
+  static getTotalDurationOfVehicleRecordingId(id: number): number {
+    return GetTotalDurationOfVehicleRecordingId(id);
+  }
+
+  getTrainCarriage(trailerNumber: number): number {
+    return GetTrainCarriage(this._handle, trailerNumber);
+  }
+
+  getTyreHealth(wheelIndex: number): number {
+    return GetTyreHealth(this._handle, wheelIndex);
+  }
+
+  getTyreWearMultiplier(wheelIndex: number): number {
+    return GetTyreWearMultiplier(this._handle, wheelIndex);
+  }
+
+  static getVehicleDriveTrainType(vehicleModel: number): number {
+    return GetVehicleDrivetrainType(vehicleModel);
+  }
+
+  static getVehicleRecordingId(recording: number, script: string): number {
+    return GetVehicleRecordingId(recording, script);
+  }
+
+  static hasFilledVehiclePopulation(): boolean {
+    return HasFilledVehiclePopulation();
+  }
+
+  static hasPreloadModsFinished(p0: any): boolean {
+    return HasPreloadModsFinished(p0);
+  }
+
+  static hasVehicleAssetLoaded(vehicleAsset: number): boolean {
+    return HasVehicleAssetLoaded(vehicleAsset);
+  }
+
+  static hasVehiclePhoneExplosiveDevice(): boolean {
+    return HasVehiclePhoneExplosiveDevice();
+  }
+
+  static hasVehicleRecordingBeenLoaded(recording: number, script: string): boolean {
+    return HasVehicleRecordingBeenLoaded(recording, script);
+  }
+
+  static instantlyFillVehiclePopulation(): void {
+    InstantlyFillVehiclePopulation();
+  }
+
+  get isAnyEntityAttachedToHandlerFrame(): boolean {
+    return IsAnyEntityAttachedToHandlerFrame(this._handle);
+  }
+
+  get isBoatAnchored(): boolean {
+    return IsBoatAnchored(this._handle);
+  }
+
+  static isCopVehicleInArea_3d(x1: number, x2: number, y1: number, y2: number, z1: number, z2: number): boolean {
+    return IsCopVehicleInArea_3d(x1, x2, y1, y2, z1, z2);
+  }
+
+  static isEntryPointForSeatClear(ped: Ped, vehicle: Vehicle, seatIndex: number, checkSide: boolean, leftSide: boolean): boolean {
+    return IsEntryPointForSeatClear(ped.handle, vehicle.handle, seatIndex, checkSide, leftSide);
+  }
+
+  isHandlerFrameAboveContainer(container: number): boolean {
+    return IsHandlerFrameAboveContainer(this._handle, container);
+  }
+
+  get isHeliLandingAreaBlocked(): boolean {
+    return IsHeliLandingAreaBlocked(this._handle);
+  }
+
+  isHeliPartBroken(p1: boolean, p2: boolean, p3: boolean): boolean {
+    return IsHeliPartBroken(this._handle, p1, p2, p3);
+  }
+
+  get isMissionTrain(): boolean {
+    return IsMissionTrain(this._handle);
+  }
+
+  static isPedExclusiveDriverOfVehicle(ped: Ped, vehicle: Vehicle): [boolean, any] {
+    return IsPedExclusiveDriverOfVehicle(ped.handle, vehicle.handle);
+  }
+
+  isSeatWarpOnly(seatIndex: number): boolean {
+    return IsSeatWarpOnly(this._handle, seatIndex);
+  }
+
+  get isTaxiLightOn(): boolean {
+    return IsTaxiLightOn(this._handle);
+  }
+
+  static isThisModelABicycle(model: number): boolean {
+    return IsThisModelABicycle(model);
+  }
+
+  static isThisModelABike(model: number): boolean {
+    return IsThisModelABike(model);
+  }
+
+  static isThisModelABoat(model: number): boolean {
+    return IsThisModelABoat(model);
+  }
+
+  static isThisModelACar(model: number): boolean {
+    return IsThisModelACar(model);
+  }
+
+  static isThisModelAHeli(model: number): boolean {
+    return IsThisModelAHeli(model);
+  }
+
+  static isThisModelAJetski(model: number): boolean {
+    return IsThisModelAJetski(model);
+  }
+
+  static isThisModelAPlane(model: number): boolean {
+    return IsThisModelAPlane(model);
+  }
+
+  static isThisModelAQuadbike(model: number): boolean {
+    return IsThisModelAQuadbike(model);
+  }
+
+  static isThisModelATrain(model: number): boolean {
+    return IsThisModelATrain(model);
+  }
+
+  static isThisModelAnAmphibiousCar(model: number): boolean {
+    return IsThisModelAnAmphibiousCar(model);
+  }
+
+  static isThisModelAnAmphibiousQuadbike(model: number): boolean {
+    return IsThisModelAnAmphibiousQuadbike(model);
+  }
+
+  isToggleModOn(modType: number): boolean {
+    return IsToggleModOn(this._handle, modType);
+  }
+
+  isTurretSeat(seatIndex: number): boolean {
+    return IsTurretSeat(this._handle, seatIndex);
+  }
+
+  lowerRetractableWheels(): void {
+    LowerRetractableWheels(this._handle);
+  }
+
+  static preloadVehicleMod(p0: any, modType: number, p2: any): void {
+    PreloadVehicleMod(p0, modType, p2);
+  }
+
+  raiseRetractableWheels(): void {
+    RaiseRetractableWheels(this._handle);
+  }
+
+  releasePreloadMods(): void {
+    ReleasePreloadMods(this._handle);
+  }
+
+  removePickUpRopeForCargobob(): void {
+    RemovePickUpRopeForCargobob(this._handle);
+  }
+
+  static removeRoadNodeSpeedZone(speedzone: number): boolean {
+    return RemoveRoadNodeSpeedZone(speedzone);
+  }
+
+  static removeVehiclesFromGeneratorsInArea(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number, unk: any): void {
+    RemoveVehiclesFromGeneratorsInArea(x1, y1, z1, x2, y2, z2, unk);
+  }
+
+  static setAllLowPriorityVehicleGeneratorsActive(active: boolean): void {
+    SetAllLowPriorityVehicleGeneratorsActive(active);
+  }
+
+  static setAllVehicleGeneratorsActive(): void {
+    SetAllVehicleGeneratorsActive();
+  }
+
+  static setAllVehicleGeneratorsActiveInArea(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number, p6: boolean, p7: boolean): void {
+    SetAllVehicleGeneratorsActiveInArea(x1, y1, z1, x2, y2, z2, p6, p7);
+  }
+
+  static setAmbientVehicleRangeMultiplierThisFrame(range: number): void {
+    SetAmbientVehicleRangeMultiplierThisFrame(range);
+  }
+
+  setBikeOnStand(x: number, y: number): void {
+    SetBikeOnStand(this._handle, x, y);
+  }
+
+  setBoatAnchor(toggle: boolean): void {
+    SetBoatAnchor(this._handle, toggle);
+  }
+
+  setBoatBoomPositionRatio(ratio: number): void {
+    SetBoatBoomPositionRatio(this._handle, ratio);
+  }
+
+  setBoatDisableAvoidance(p1: boolean): void {
+    SetBoatDisableAvoidance(this._handle, p1);
+  }
+
+  setBoatIsSinking(): void {
+    SetBoatIsSinking(this._handle);
+  }
+
+  setBoatLowLodAnchorDistance(value: number): void {
+    SetBoatLowLodAnchorDistance(this._handle, value);
+  }
+
+  setBoatRemainsAnchoredWhilePlayerIsDriver(toggle: boolean): void {
+    SetBoatRemainsAnchoredWhilePlayerIsDriver(this._handle, toggle);
+  }
+
+  setBoatSinksWhenWrecked(toggle: boolean): void {
+    SetBoatSinksWhenWrecked(this._handle, toggle);
+  }
+
+  setCamberedWheelsDisabled(toggle: boolean): void {
+    SetCamberedWheelsDisabled(this._handle, toggle);
+  }
+
+  setCarBootOpen(): void {
+    SetCarBootOpen(this._handle);
+  }
+
+  static setCarHighSpeedBumpSeverityMultiplier(multiplier: number): void {
+    SetCarHighSpeedBumpSeverityMultiplier(multiplier);
+  }
+
+  setCargobobExcludeFromPickupEntity(entity: number): void {
+    SetCargobobExcludeFromPickupEntity(this._handle, entity);
+  }
+
+  setCargobobPickupMagnetEffectRadius(p1: number): void {
+    SetCargobobPickupMagnetEffectRadius(this._handle, p1);
+  }
+
+  setCargobobPickupMagnetFalloff(p1: number): void {
+    SetCargobobPickupMagnetFalloff(this._handle, p1);
+  }
+
+  setCargobobPickupMagnetPullRopeLength(p1: number): void {
+    SetCargobobPickupMagnetPullRopeLength(this._handle, p1);
+  }
+
+  setCargobobPickupMagnetPullStrength(p1: number): void {
+    SetCargobobPickupMagnetPullStrength(this._handle, p1);
+  }
+
+  setCargobobPickupMagnetReducedFalloff(p1: number): void {
+    SetCargobobPickupMagnetReducedFalloff(this._handle, p1);
+  }
+
+  setCargobobPickupMagnetReducedStrength(vehicle: Vehicle): void {
+    SetCargobobPickupMagnetReducedStrength(this._handle, vehicle.handle);
+  }
+
+  setCargobobPickupMagnetStrength(strength: number): void {
+    SetCargobobPickupMagnetStrength(this._handle, strength);
+  }
+
+  setCargobobPickupRopeDampingMultiplier(p1: number): void {
+    SetCargobobPickupRopeDampingMultiplier(this._handle, p1);
+  }
+
+  setCargobobPickupRopeType(state: number): void {
+    SetCargobobPickupRopeType(this._handle, state);
+  }
+
+  setDeployHeliStubWings(deploy: boolean, p2: boolean): void {
+    SetDeployHeliStubWings(this._handle, deploy, p2);
+  }
+
+  static setDisableBmxExtraTrickForces(disableExtraTrickForces: boolean): void {
+    SetDisableBmxExtraTrickForces(disableExtraTrickForces);
+  }
+
+  setDisableHeliExplodeFromBodyDamage(disableExplode: boolean): void {
+    SetDisableHeliExplodeFromBodyDamage(this._handle, disableExplode);
+  }
+
+  setDisablePretendOccupants(toggle: boolean): void {
+    SetDisablePretendOccupants(this._handle, toggle);
+  }
+
+  static setDisableRandomTrainsThisFrame(toggle: boolean): void {
+    SetDisableRandomTrainsThisFrame(toggle);
+  }
+
+  setDisableSuperdummyMode(p1: boolean): void {
+    SetDisableSuperdummyMode(this._handle, p1);
+  }
+
+  setDisableTurretMovementThisFrame(turretIdx: number): void {
+    SetDisableTurretMovementThisFrame(this._handle, turretIdx);
+  }
+
+  static setDistantCarsEnabled(toggle: boolean): void {
+    SetDistantCarsEnabled(toggle);
+  }
+
+  setDriftTyresEnabled(toggle: boolean): void {
+    SetDriftTyresEnabled(this._handle, toggle);
+  }
+
+  static setEnableVehicleSlipstreaming(toggle: boolean): void {
+    SetEnableVehicleSlipstreaming(toggle);
+  }
+
+  static setFarDrawVehicles(toggle: boolean): void {
+    SetFarDrawVehicles(toggle);
+  }
+
+  setForceLowLodAnchorMode(toggle: boolean): void {
+    SetForceLowLodAnchorMode(this._handle, toggle);
+  }
+
+  static setGarbageTrucks(toggle: boolean): void {
+    SetGarbageTrucks(toggle);
+  }
+
+  setHeliBladesSpeed(speed: number): void {
+    SetHeliBladesSpeed(this._handle, speed);
+  }
+
+  setHeliCombatOffset(x: number, y: number, z: number): void {
+    SetHeliCombatOffset(this._handle, x, y, z);
+  }
+
+  setHeliMainRotorHealth(health: number): void {
+    SetHeliMainRotorHealth(this._handle, health);
+  }
+
+  setHeliResistToExplosion(bResistToExplosion: boolean): void {
+    SetHeliResistToExplosion(this._handle, bResistToExplosion);
+  }
+
+  setHeliTailBoomCanBreakOff(toggle: boolean): void {
+    SetHeliTailBoomCanBreakOff(this._handle, toggle);
+  }
+
+  setHeliTailRotorHealth(health: number): void {
+    SetHeliTailRotorHealth(this._handle, health);
+  }
+
+  setHeliTurbulenceScalar(p1: number): void {
+    SetHeliTurbulenceScalar(this._handle, p1);
+  }
+
+  setHelicopterRollPitchYawMult(multiplier: number): void {
+    SetHelicopterRollPitchYawMult(this._handle, multiplier);
+  }
+
+  setHoverModeWingRatio(ratio: number): void {
+    SetHoverModeWingRatio(this._handle, ratio);
+  }
+
+  setHydraulicRaised(toggle: boolean): void {
+    SetHydraulicRaised(this._handle, toggle);
+  }
+
+  setHydraulicWheelState(state: number): void {
+    SetHydraulicWheelState(this._handle, state);
+  }
+
+  static setLightsCutoffDistanceTweak(distance: number): void {
+    SetLightsCutoffDistanceTweak(distance);
+  }
+
+  setMissionTrainAsNoLongerNeeded(p1: boolean): void {
+    SetMissionTrainAsNoLongerNeeded(p1);
+  }
+
+  setMissionTrainCoords(x: number, y: number, z: number): void {
+    SetMissionTrainCoords(this._handle, x, y, z);
+  }
+
+  setOppressorTransformState(extend: boolean): void {
+    SetOppressorTransformState(this._handle, extend);
+  }
+
+  setPickupRopeLengthForCargobob(length1: number, length2: number, state: boolean): void {
+    SetPickupRopeLengthForCargobob(this._handle, length1, length2, state);
+  }
+
+  setPlaneAvoidsOther(toggle: boolean): void {
+    SetPlaneAvoidsOthers(this._handle, toggle);
+  }
+
+  setPlaneControlSectionsShouldBreakOffFromExplosions(toggle: boolean): void {
+    SetPlaneControlSectionsShouldBreakOffFromExplosions(this._handle, toggle);
+  }
+
+  setPlanePropellersHealth(health: number): void {
+    SetPlanePropellersHealth(this._handle, health);
+  }
+
+  setPlaneResistToExplosion(toggle: boolean): void {
+    SetPlaneResistToExplosion(this._handle, toggle);
+  }
+
+  setPlaneSectionDamageScale(damageSection: number, damageScale: number): void {
+    SetPlaneSectionDamageScale(this._handle, damageSection, damageScale);
+  }
+
+  setPlaneTurbulenceMultiplier(multiplier: number): void {
+    SetPlaneTurbulenceMultiplier(this._handle, multiplier);
+  }
+
+  setPlaybackSpeed(speed: number): void {
+    SetPlaybackSpeed(this._handle, speed);
+  }
+
+  setPlaybackToUseAi(drivingStyle: number): void {
+    SetPlaybackToUseAi(this._handle, drivingStyle);
+  }
+
+  setPlaybackToUseAiTryToRevertBackLater(time: number, drivingStyle: number, p3: boolean): void {
+    SetPlaybackToUseAiTryToRevertBackLater(this._handle, time, drivingStyle, p3);
+  }
+
+  static setRandomBoats(toggle: boolean): void {
+    SetRandomBoats(toggle);
+  }
+
+  static setRandomBoatsInMp(toggle: boolean): void {
+    SetRandomBoatsInMp(toggle);
+  }
+
+  static setRandomTrains(toggle: boolean): void {
+    SetRandomTrains(toggle);
+  }
+
+  setRenderTrainAsDerailed(toggle: boolean): void {
+    SetRenderTrainAsDerailed(this._handle, toggle);
+  }
+
+  setTrailerInverseMassScale(p1: number): void {
+    SetTrailerInverseMassScale(this._handle, p1);
+  }
+
+  setTrainCruiseSpeed(speed: number): void {
+    SetTrainCruiseSpeed(this._handle, speed);
+  }
+
+  setTrainSpeed(speed: number): void {
+    SetTrainSpeed(this._handle, speed);
+  }
+
+  static setTrainTrackSpawnFrequency(trackIndex: number, frequency: number): void {
+    SetTrainTrackSpawnFrequency(trackIndex, frequency);
+  }
+
+  setTyreHealth(wheelIndex: number, health: number): void {
+    SetTyreHealth(this._handle, wheelIndex, health);
+  }
+
+  setTyreSoftnessMultiplier(wheelIndex: number, multiplier: number): void {
+    SetTyreSoftnessMultiplier(this._handle, wheelIndex, multiplier);
+  }
+
+  setTyreTractionLossMultiplier(wheelIndex: number, multiplier: number): void {
+    SetTyreTractionLossMultiplier(this._handle, wheelIndex, multiplier);
+  }
+
+  setTyreWearMultiplier(wheelIndex: number, multiplier: number): void {
+    SetTyreWearMultiplier(this._handle, wheelIndex, multiplier);
+  }
+
+  stabiliseEntityAttachedToHeli(entity: number, p2: number): void {
+    StabiliseEntityAttachedToHeli(this._handle, entity, p2);
+  }
+
+  static stopAllGarageActivity(): void {
+    StopAllGarageActivity();
+  }
+
+  static switchTrainTrack(trackId: number, state: boolean): void {
+    SwitchTrainTrack(trackId, state);
   }
 }
