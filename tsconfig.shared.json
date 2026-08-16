@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "lib": ["es2020"],
+        "types": ["@types/node"],
+        "rootDir": "./shared",
+        "outDir": "./dist/shared",
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "allowSyntheticDefaultImports": true,
+    },
+    "include": ["shared/**/*.ts"]
+}
