@@ -1,4 +1,4 @@
-import { Vector3 } from '../Math/Vector3';
+import {IVector3} from '../typings/Vector3';
 import { BaseEntity } from './BaseEntity';
 
 export class Ped extends BaseEntity {
@@ -33,7 +33,7 @@ export class Ped extends BaseEntity {
   static create(
     pedType: number,
     modelHash: number,
-    pos: Vector3,
+    pos: IVector3,
     heading: number,
     isNetwork: boolean,
     bScriptHostPed: boolean,
@@ -54,7 +54,7 @@ export class Ped extends BaseEntity {
     return this.fromHandle(handle);
   }
 
-  static createRandom(pos: Vector3): Ped | null {
+  static createRandom(pos: IVector3): Ped | null {
     const handle = CreateRandomPed(pos.x, pos.y, pos.z);
     return this.fromHandle(handle);
   }
@@ -65,7 +65,7 @@ export class Ped extends BaseEntity {
     return this.fromHandle(handle);
   }
 
-  static createSynchronizedScene(pos: Vector3, roll: number, pitch: number, yaw: number, p6: number): number {
+  static createSynchronizedScene(pos: IVector3, roll: number, pitch: number, yaw: number, p6: number): number {
     return CreateSynchronizedScene(pos.x, pos.y, pos.z, roll, pitch, yaw, p6);
   }
 
@@ -74,7 +74,7 @@ export class Ped extends BaseEntity {
   }
 
   static getClosest(
-    pos: Vector3,
+    pos: IVector3,
     radius: number,
     p4: boolean,
     p5: boolean,
@@ -124,7 +124,7 @@ export class Ped extends BaseEntity {
     return GetPedheadshotTxdString(id);
   }
 
-  static getRandomAtCoord(pos: Vector3, radius: Vector3, pedType: number): Ped | null {
+  static getRandomAtCoord(pos: IVector3, radius: IVector3, pedType: number): Ped | null {
     const handle = GetRandomPedAtCoord(pos.x, pos.y, pos.z, radius.x, radius.y, radius.z, pedType);
     return this.fromHandle(handle);
   }
@@ -149,15 +149,15 @@ export class Ped extends BaseEntity {
     InstantlyFillPedPopulation();
   }
 
-  static isAnyNearPoint(pos: Vector3, radius: number): boolean {
+  static isAnyNearPoint(pos: IVector3, radius: number): boolean {
     return IsAnyPedNearPoint(pos.x, pos.y, pos.z, radius);
   }
 
-  static isAnyShootingInArea(min: Vector3, max: Vector3, bHighlightArea: boolean, bDo3DCheck: boolean): boolean {
+  static isAnyShootingInArea(min: IVector3, max: IVector3, bHighlightArea: boolean, bDo3DCheck: boolean): boolean {
     return IsAnyPedShootingInArea(min.x, min.y, min.z, max.x, max.y, max.z, bHighlightArea, bDo3DCheck);
   }
 
-  static isCopInArea_3d(min: Vector3, max: Vector3): boolean {
+  static isCopInArea_3d(min: IVector3, max: IVector3): boolean {
     return IsCopPedInArea_3d(min.x, min.y, min.z, max.x, max.y, max.z);
   }
 
@@ -229,7 +229,7 @@ export class Ped extends BaseEntity {
     SetPedModelIsSuppressed(model, toggle);
   }
 
-  static setNonCreationArea(min: Vector3, max: Vector3): void {
+  static setNonCreationArea(min: IVector3, max: IVector3): void {
     SetPedNonCreationArea(min.x, min.y, min.z, max.x, max.y, max.z);
   }
 
@@ -241,7 +241,7 @@ export class Ped extends BaseEntity {
     SetScenarioPedDensityMultiplierThisFrame(interiorMult, exteriorMult);
   }
 
-  static setScenarioPedsSpawnInSphereArea(pos: Vector3, range: number, p4: number): void {
+  static setScenarioPedsSpawnInSphereArea(pos: IVector3, range: number, p4: number): void {
     SetScenarioPedsSpawnInSphereArea(pos.x, pos.y, pos.z, range, p4);
   }
 
@@ -261,11 +261,9 @@ export class Ped extends BaseEntity {
     UnregisterPedheadshot(id);
   }
 
-
   get handle(): number {
     return this._handle;
   }
-
 
   addArmour(amount: number): void {
     AddArmourToPed(this._handle, amount);
@@ -283,7 +281,7 @@ export class Ped extends BaseEntity {
     ApplyDamageToPed(this._handle, damageAmount, armorFirst);
   }
 
-  applyBlood(boneIndex: number, rot: Vector3, woundType: string): void {
+  applyBlood(boneIndex: number, rot: IVector3, woundType: string): void {
     ApplyPedBlood(this._handle, boneIndex, rot.x, rot.y, rot.z, woundType);
   }
 
@@ -294,7 +292,9 @@ export class Ped extends BaseEntity {
   applyBloodDamageByZone(p1: any, p2: number, p3: number, p4: any): void {
     ApplyPedBloodDamageByZone(this._handle, p1, p2, p3, p4);
   }
-
+  get killFallHeight():number {
+    return GetKillFallHeight()
+  }
   applyBloodSpecific(
     component: number,
     u: number,
@@ -464,7 +464,7 @@ export class Ped extends BaseEntity {
     return GetCombatFloat(this._handle, p1);
   }
 
-  getDeadPickupCoords(p1: number, p2: number): Vector3 {
+  getDeadPickupCoords(p1: number, p2: number): IVector3 {
     const [x, y, z] = GetDeadPedPickupCoords(this._handle, p1, p2);
     return { x, y, z };
   }
@@ -505,7 +505,7 @@ export class Ped extends BaseEntity {
     return GetPedArmour(this._handle);
   }
 
-  getBoneCoords(boneId: number, offset: Vector3): Vector3 {
+  getBoneCoords(boneId: number, offset: IVector3): IVector3 {
     const [x, y, z] = GetPedBoneCoords(this._handle, boneId, offset.x, offset.y, offset.z);
     return { x, y, z };
   }
@@ -538,7 +538,7 @@ export class Ped extends BaseEntity {
     return GetPedDecorationsState(this._handle);
   }
 
-  getDefensiveAreaPosition(p1: boolean): Vector3 {
+  getDefensiveAreaPosition(p1: boolean): IVector3 {
     const [x, y, z] = GetPedDefensiveAreaPosition(this._handle, p1);
     return { x, y, z };
   }
@@ -563,7 +563,7 @@ export class Ped extends BaseEntity {
     return GetPedEventData(this._handle, eventType);
   }
 
-  getExtractedDisplacement(worldSpace: boolean): Vector3 {
+  getExtractedDisplacement(worldSpace: boolean): IVector3 {
     const [x, y, z] = GetPedExtractedDisplacement(this._handle, worldSpace);
     return { x, y, z };
   }
@@ -740,7 +740,7 @@ export class Ped extends BaseEntity {
     HidePedBloodDamageByZone(this._handle, p1, p2);
   }
 
-  isAnyHostileNearPoint(pos: Vector3, radius: number): boolean {
+  isAnyHostileNearPoint(pos: IVector3, radius: number): boolean {
     return IsAnyHostilePedNearPoint(this._handle, pos.x, pos.y, pos.z, radius);
   }
 
@@ -836,7 +836,7 @@ export class Ped extends BaseEntity {
     return IsPedHangingOnToVehicle(this._handle);
   }
 
-  isHeadingTowardsPosition(pos: Vector3, p4: number): boolean {
+  isHeadingTowardsPosition(pos: IVector3, p4: number): boolean {
     return IsPedHeadingTowardsPosition(this._handle, pos.x, pos.y, pos.z, p4);
   }
 
@@ -928,7 +928,7 @@ export class Ped extends BaseEntity {
     return IsPedInParachuteFreeFall(this._handle);
   }
 
-  isInSphereAreaOfAnyEnemyPeds(pos: Vector3, range: number): boolean {
+  isInSphereAreaOfAnyEnemyPeds(pos: IVector3, range: number): boolean {
     return IsPedInSphereAreaOfAnyEnemyPeds(this._handle, pos.x, pos.y, pos.z, range);
   }
 
@@ -1040,7 +1040,7 @@ export class Ped extends BaseEntity {
     return IsPedShooting(this._handle);
   }
 
-  isShootingInArea(min: Vector3, max: Vector3, p7: boolean, p8: boolean): boolean {
+  isShootingInArea(min: IVector3, max: IVector3, p7: boolean, p8: boolean): boolean {
     return IsPedShootingInArea(this._handle, min.x, min.y, min.z, max.x, max.y, max.z, p7, p8);
   }
 
@@ -1228,7 +1228,7 @@ export class Ped extends BaseEntity {
     ikIndex: number,
     entityLookAtHandle: number,
     boneLookAt: number,
-    offset: Vector3,
+    offset: IVector3,
     ikTargetFlags: number,
     blendInDuration: number,
     blendOutDuration: number,
@@ -1446,7 +1446,7 @@ export class Ped extends BaseEntity {
   }
 
   setClothProne(p0: any): void {
-    SetPedClothProne(this._handle, p0 );
+    SetPedClothProne(this._handle, p0);
   }
 
   setCombatAbility(p1: number): void {
@@ -1473,11 +1473,11 @@ export class Ped extends BaseEntity {
     SetPedConfigFlag(this._handle, flagId, value);
   }
 
-  setCoordsKeepVehicle(pos: Vector3): void {
+  setCoordsKeepVehicle(pos: IVector3): void {
     SetPedCoordsKeepVehicle(this._handle, pos.x, pos.y, pos.z);
   }
 
-  setCoordsNoGang(pos: Vector3): void {
+  setCoordsNoGang(pos: IVector3): void {
     SetPedCoordsNoGang(this._handle, pos.x, pos.y, pos.z);
   }
 
@@ -1512,11 +1512,11 @@ export class Ped extends BaseEntity {
     SetPedDefensiveAreaDirection(this._handle, p1, p2, p3, p4);
   }
 
-  setDefensiveSphereAttachedToPed(targetHandle: number, offset: Vector3, radius: number, p6: boolean): void {
+  setDefensiveSphereAttachedToPed(targetHandle: number, offset: IVector3, radius: number, p6: boolean): void {
     SetPedDefensiveSphereAttachedToPed(this._handle, targetHandle, offset.x, offset.y, offset.z, radius, p6);
   }
 
-  setDefensiveSphereAttachedToVehicle(targetHandle: number, offset: Vector3, radius: number, p6: boolean): void {
+  setDefensiveSphereAttachedToVehicle(targetHandle: number, offset: IVector3, radius: number, p6: boolean): void {
     SetPedDefensiveSphereAttachedToVehicle(this._handle, targetHandle, offset.x, offset.y, offset.z, radius, p6);
   }
 
@@ -1755,7 +1755,7 @@ export class Ped extends BaseEntity {
     SetPedNeverLeavesGroup(this._handle, toggle);
   }
 
-  setPanicExitScenario(pos: Vector3): void {
+  setPanicExitScenario(pos: IVector3): void {
     SetPedPanicExitScenario(this._handle, pos.x, pos.y, pos.z);
   }
 
@@ -1839,11 +1839,11 @@ export class Ped extends BaseEntity {
     SetPedShootRate(this._handle, shootRate);
   }
 
-  setShootsAtCoord(pos: Vector3, toggle: boolean): void {
+  setShootsAtCoord(pos: IVector3, toggle: boolean): void {
     SetPedShootsAtCoord(this._handle, pos.x, pos.y, pos.z, toggle);
   }
 
-  setShouldPlayDirectedScenarioExit(pos: Vector3): void {
+  setShouldPlayDirectedScenarioExit(pos: IVector3): void {
     SetPedShouldPlayDirectedScenarioExit(this._handle, pos.x, pos.y, pos.z);
   }
 
@@ -1859,7 +1859,7 @@ export class Ped extends BaseEntity {
     SetPedShouldPlayNormalScenarioExit(this._handle);
   }
 
-  setSphereDefensiveArea(pos: Vector3, radius: number, p5: boolean, p6: boolean): void {
+  setSphereDefensiveArea(pos: IVector3, radius: number, p5: boolean, p6: boolean): void {
     SetPedSphereDefensiveArea(this._handle, pos.x, pos.y, pos.z, radius, p5, p6);
   }
 
@@ -1926,10 +1926,10 @@ export class Ped extends BaseEntity {
     minTime: number,
     maxTime: number,
     nFallType: number,
-    dir: Vector3,
+    dir: IVector3,
     fGroundHeight: number,
-    grab1: Vector3,
-    grab2: Vector3,
+    grab1: IVector3,
+    grab2: IVector3,
   ): void {
     SetPedToRagdollWithFall(
       this._handle,
