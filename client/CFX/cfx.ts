@@ -34,9 +34,7 @@ export class CFX {
   static wasEventCanceled() {
     return WasEventCanceled();
   }
-  static activateTimecycleEditor(): void {
-    ActivateTimecycleEditor();
-  }
+
 
   static addAudioSubmixOutput(submixId: number, outputSubmixId: number): void {
     AddAudioSubmixOutput(submixId, outputSubmixId);
@@ -111,17 +109,11 @@ export class CFX {
   static applyWeatherCycles(numEntries: number, msPerCycle: number): void {
     ApplyWeatherCycles(numEntries, msPerCycle);
   }
-  static cloneTimecycleModifier(sourceModifierName: string, clonedModifierName: string): void {
-    CloneTimecycleModifier(sourceModifierName, clonedModifierName);
-  }
-
+ 
   static commitRuntimeTexture(tex: number): void {
     CommitRuntimeTexture(tex);
   }
 
-  static callMinimapScaleformFunction(miniMap: number, fnName: string): void {
-    CallMinimapScaleformFunction(miniMap, fnName);
-  }
 
   static createRuntimeTexture(txd: number, txn: string, width: number, height: number): void {
     CreateRuntimeTexture(txd, txn, width, height);
@@ -139,9 +131,7 @@ export class CFX {
     CreateRuntimeTxd(name);
   }
 
-  static createTimecycleModifier(modifierName: string): void {
-    CreateTimecycleModifier(modifierName);
-  }
+
 
   static deleteFunctionReference(referenceIdentity: string): void {
     DeleteFunctionReference(referenceIdentity);
@@ -167,9 +157,7 @@ export class CFX {
     DisableWorldhorizonRendering(state);
   }
 
-  static doesTimecycleModifierHasVar(modifierName: string, varName: string): boolean {
-    return DoesTimecycleModifierHasVar(modifierName, varName);
-  }
+
   static doorSystemGetActive(): boolean {
     return DoorSystemGetActive();
   }
