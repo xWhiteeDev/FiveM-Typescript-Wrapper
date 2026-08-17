@@ -3,9 +3,9 @@ import { Utils } from '../Utils/Utils';
 import { Ped } from '../Entities/Ped';
 
 export class WorldObject {
-  private static world_objects = new Map<number,WorldObject>()
+  private static world_objects = new Map<number, WorldObject>();
   private constructor(private _handle: number) {
-    WorldObject.world_objects.set(_handle,this)
+    WorldObject.world_objects.set(_handle, this);
   }
   static async create(model: string, coords: IVector3, isNetwork: boolean, netMissionEntity: boolean, doorFlag: boolean) {
     const hashKey = GetHashKey(model);
@@ -60,40 +60,33 @@ export class WorldObject {
   }
   delete() {
     DeleteObject(this._handle);
-    const isObjectDeleted = IsEntityAMissionEntity(this._handle)
+    const isObjectDeleted = IsEntityAMissionEntity(this._handle);
     if (isObjectDeleted) {
-      WorldObject.world_objects.delete(this.handle)
+      WorldObject.world_objects.delete(this.handle);
     }
-    return isObjectDeleted
+    return isObjectDeleted;
   }
-  static get (handle:number) {
-    WorldObject.world_objects.get(handle)
+  static get(handle: number) {
+    WorldObject.world_objects.get(handle);
   }
 
-  static doesObjectExistAtCoord(coords: IVector3, inRange: number, hashOrName: number | string, p5:boolean) {
+  static doesObjectExistAtCoord(coords: IVector3, inRange: number, hashOrName: number | string, p5: boolean) {
     const hashKey = typeof hashOrName === 'string' ? GetHashKey(hashOrName) : hashOrName;
-    return DoesObjectOfTypeExistAtCoords(coords.x,coords.y,coords.z,inRange,hashKey,false);
+    return DoesObjectOfTypeExistAtCoords(coords.x, coords.y, coords.z, inRange, hashKey, false);
   }
-  static doesPickupObjectExist(objectHandle:number) {
+  static doesPickupObjectExist(objectHandle: number) {
     return DoesPickupObjectExist(objectHandle);
   }
-  static doesPickupExist(objectHandle:number) {
-    return DoesPickupExist(objectHandle)
+  static doesPickupExist(objectHandle: number) {
+    return DoesPickupExist(objectHandle);
   }
   static fromHandle(handle: number): WorldObject | null {
     if (!DoesEntityExist(handle)) return null;
     return new this(handle);
   }
 
-  static doorControl(
-    modelHash: number,
-    coords: IVector3,
-    locked: boolean,
-    xRotMult: number,
-    yRotMult: number,
-    zRotMult: number,
-  ): void {
-    DoorControl(modelHash, coords.x, coords.y, coords.z, locked, xRotMult, yRotMult, zRotMult);
+  static doorControl(modelHash: number, coords: IVector3, locked: boolean, rotMult: IVector3): void {
+    DoorControl(modelHash, coords.x, coords.y, coords.z, locked, rotMult.x, rotMult.y, rotMult.z);
   }
 
   static getClosestOfType(
@@ -104,16 +97,7 @@ export class WorldObject {
     p6: boolean = false,
     p7: boolean = false,
   ): WorldObject | null {
-    const handle = GetClosestObjectOfType(
-      coords.x,
-      coords.y,
-      coords.z,
-      radius,
-      modelHash,
-      isMission,
-      p6,
-      p7,
-    );
+    const handle = GetClosestObjectOfType(coords.x, coords.y, coords.z, radius, modelHash, isMission, p6, p7);
     if (!DoesEntityExist(handle)) return null;
     return new this(handle);
   }
@@ -138,20 +122,8 @@ export class WorldObject {
     ];
   }
 
-  static getOffsetFromCoordAndHeadingInWorldCoords(
-    pos: IVector3,
-    heading: number,
-    offset: IVector3,
-  ): IVector3 {
-    const [x, y, z] = GetOffsetFromCoordAndHeadingInWorldCoords(
-      pos.x,
-      pos.y,
-      pos.z,
-      heading,
-      offset.x,
-      offset.y,
-      offset.z,
-    );
+  static getOffsetFromCoordAndHeadingInWorldCoords(pos: IVector3, heading: number, offset: IVector3): IVector3 {
+    const [x, y, z] = GetOffsetFromCoordAndHeadingInWorldCoords(pos.x, pos.y, pos.z, heading, offset.x, offset.y, offset.z);
     return { x, y, z };
   }
 
@@ -165,31 +137,12 @@ export class WorldObject {
     return GetRayfireMapObject(coords.x, coords.y, coords.z, radius, name);
   }
 
-  static hasClosestOfTypeBeenBroken(
-    p0: number,
-    p1: number,
-    p2: number,
-    p3: number,
-    modelHash: number,
-    p5: any,
-  ): boolean {
+  static hasClosestOfTypeBeenBroken(p0: number, p1: number, p2: number, p3: number, modelHash: number, p5: any): boolean {
     return HasClosestObjectOfTypeBeenBroken(p0, p1, p2, p3, modelHash, p5);
   }
 
-  static hasClosestOfTypeBeenCompletelyDestroyed(
-    coords: IVector3,
-    radius: number,
-    modelHash: number,
-    p5: boolean,
-  ): boolean {
-    return HasClosestObjectOfTypeBeenCompletelyDestroyed(
-      coords.x,
-      coords.y,
-      coords.z,
-      radius,
-      modelHash,
-      p5,
-    );
+  static hasClosestOfTypeBeenCompletelyDestroyed(coords: IVector3, radius: number, modelHash: number, p5: boolean): boolean {
+    return HasClosestObjectOfTypeBeenCompletelyDestroyed(coords.x, coords.y, coords.z, radius, modelHash, p5);
   }
 
   static isAnyNearPoint(coords: IVector3, range: number, p4: boolean): boolean {
@@ -200,12 +153,7 @@ export class WorldObject {
     return IsDoorRegisteredWithSystem(doorHash);
   }
 
-  static isEntirelyInsideGarage(
-    garageHash: number,
-    entityHandle: number,
-    p2: number,
-    p3: number,
-  ): boolean {
+  static isEntirelyInsideGarage(garageHash: number, entityHandle: number, p2: number, p3: number): boolean {
     return IsObjectEntirelyInsideGarage(garageHash, entityHandle, p2, p3);
   }
 
@@ -227,25 +175,16 @@ export class WorldObject {
     modelHash: number,
     textureVariation: number,
   ): boolean {
-    return SetTextureVariationOfClosestObjectOfType(
-      coords.x,
-      coords.y,
-      coords.z,
-      radius,
-      modelHash,
-      textureVariation,
-    );
+    return SetTextureVariationOfClosestObjectOfType(coords.x, coords.y, coords.z, radius, modelHash, textureVariation);
   }
 
   static toggleUsePickupsForPlayer(player: number, pickupHash: number, toggle: boolean): void {
     ToggleUsePickupsForPlayer(player, pickupHash, toggle);
   }
 
-
   get handle(): number {
     return this._handle;
   }
-
 
   doesRayfireMapExist(): boolean {
     return DoesRayfireMapObjectExist(this._handle);
@@ -384,29 +323,23 @@ export class WorldObject {
     SetTeamPickupObject(this._handle, p1, p2);
   }
 
-  slide(
-    to: IVector3,
-    speed: IVector3,
-    collision: boolean,
-  ): boolean {
-    return SlideObject(
-      this._handle,
-      to.x,
-      to.y,
-      to.z,
-      speed.x,
-      speed.y,
-      speed.z,
-      collision,
-    );
+  slide(to: IVector3, speed: IVector3, collision: boolean): boolean {
+    return SlideObject(this._handle, to.x, to.y, to.z, speed.x, speed.y, speed.z, collision);
   }
 
   trackVisibility(): void {
     TrackObjectVisibility(this._handle);
   }
 
-  static addDoorToSystem(doorHash: number, modelHash: number, x: number, y: number, z: number, p5: boolean, scriptDoor: boolean, isLocal: boolean): void {
-    AddDoorToSystem(doorHash, modelHash, x, y, z, p5, scriptDoor, isLocal);
+  static addDoorToSystem(
+    doorHash: number,
+    modelHash: number,
+    coords: IVector3,
+    p5: boolean,
+    scriptDoor: boolean,
+    isLocal: boolean,
+  ): void {
+    AddDoorToSystem(doorHash, modelHash, coords.x, coords.y, coords.z, p5, scriptDoor, isLocal);
   }
 
   static areEntitiesEntirelyInsideGarage(garageHash: number, p1: boolean, p2: boolean, p3: boolean, p4: any): boolean {
@@ -425,42 +358,89 @@ export class WorldObject {
     ClearGarageArea(garageHash, isNetwork);
   }
 
-  static clearObjectsInsideGarage(garageHash: number, vehicles: boolean, peds: boolean, objects: boolean, isNetwork: boolean): void {
+  static clearObjectsInsideGarage(
+    garageHash: number,
+    vehicles: boolean,
+    peds: boolean,
+    objects: boolean,
+    isNetwork: boolean,
+  ): void {
     ClearObjectsInsideGarage(garageHash, vehicles, peds, objects, isNetwork);
   }
 
-  static createAmbientPickup(pickupHash: number, posX: number, posY: number, posZ: number, flags: number, value: number, modelHash: number, returnHandle: boolean, p8: boolean): number {
-    return CreateAmbientPickup(pickupHash, posX, posY, posZ, flags, value, modelHash, returnHandle, p8);
+  static createAmbientPickup(
+    pickupHash: number,
+    pos: IVector3,
+    flags: number,
+    value: number,
+    modelHash: number,
+    returnHandle: boolean,
+    p8: boolean,
+  ): number {
+    return CreateAmbientPickup(pickupHash, pos.x, pos.y, pos.z, flags, value, modelHash, returnHandle, p8);
   }
 
-  static createMoneyPickups(x: number, y: number, z: number, value: number, amount: number, model: number): void {
-    CreateMoneyPickups(x, y, z, value, amount, model);
+  static createMoneyPickups(coords: IVector3, value: number, amount: number, model: number): void {
+    CreateMoneyPickups(coords.x, coords.y, coords.z, value, amount, model);
   }
 
-  static createNonNetworkedAmbientPickup(pickupHash: any, posX: number, posY: number, posZ: number, flags: number, value: number, modelHash: any, p7: boolean, p8: boolean): any {
-    return CreateNonNetworkedAmbientPickup(pickupHash, posX, posY, posZ, flags, value, modelHash, p7, p8);
+  static createNonNetworkedAmbientPickup(
+    pickupHash: any,
+    pos: IVector3,
+    flags: number,
+    value: number,
+    modelHash: any,
+    p7: boolean,
+    p8: boolean,
+  ): any {
+    return CreateNonNetworkedAmbientPickup(pickupHash, pos.x, pos.y, pos.z, flags, value, modelHash, p7, p8);
   }
 
-  static createNonNetworkedPortablePickup(pickupHash: number, x: number, y: number, z: number, placeOnGround: boolean, modelHash: number): WorldObject | null {
-    const handle = CreateNonNetworkedPortablePickup(pickupHash, x, y, z, placeOnGround, modelHash);
+  static createNonNetworkedPortablePickup(
+    pickupHash: number,
+    coords: IVector3,
+    placeOnGround: boolean,
+    modelHash: number,
+  ): WorldObject | null {
+    const handle = CreateNonNetworkedPortablePickup(pickupHash, coords.x, coords.y, coords.z, placeOnGround, modelHash);
     return WorldObject.fromHandle(handle);
   }
 
-  static createObjectNoOffset(modelHash: number, x: number, y: number, z: number, isNetwork: boolean, netMissionEntity: boolean, doorFlag: boolean): WorldObject | null {
-    const handle = CreateObjectNoOffset(modelHash, x, y, z, isNetwork, netMissionEntity, doorFlag);
+  static createObjectNoOffset(
+    modelHash: number,
+    coords: IVector3,
+    isNetwork: boolean,
+    netMissionEntity: boolean,
+    doorFlag: boolean,
+  ): WorldObject | null {
+    const handle = CreateObjectNoOffset(modelHash, coords.x, coords.y, coords.z, isNetwork, netMissionEntity, doorFlag);
     return WorldObject.fromHandle(handle);
   }
 
-  static createPickup(pickupHash: number, posX: number, posY: number, posZ: number, p4: number, value: number, p6: boolean, modelHash: number): number {
-    return CreatePickup(pickupHash, posX, posY, posZ, p4, value, p6, modelHash);
+  static createPickup(pickupHash: number, pos: IVector3, p4: number, value: number, p6: boolean, modelHash: number): number {
+    return CreatePickup(pickupHash, pos.x, pos.y, pos.z, p4, value, p6, modelHash);
   }
 
-  static createPickupRotate(pickupHash: number, posX: number, posY: number, posZ: number, rotX: number, rotY: number, rotZ: number, flag: number, amount: number, p9: any, p10: boolean, modelHash: number): number {
-    return CreatePickupRotate(pickupHash, posX, posY, posZ, rotX, rotY, rotZ, flag, amount, p9, p10, modelHash);
+  static createPickupRotate(
+    pickupHash: number,
+    pos: IVector3,
+    rot: IVector3,
+    flag: number,
+    amount: number,
+    p9: any,
+    p10: boolean,
+    modelHash: number,
+  ): number {
+    return CreatePickupRotate(pickupHash, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, flag, amount, p9, p10, modelHash);
   }
 
-  static createPortablePickup(pickupHash: number, x: number, y: number, z: number, placeOnGround: boolean, modelHash: number): WorldObject | null {
-    const handle = CreatePortablePickup(pickupHash, x, y, z, placeOnGround, modelHash);
+  static createPortablePickup(
+    pickupHash: number,
+    coords: IVector3,
+    placeOnGround: boolean,
+    modelHash: number,
+  ): WorldObject | null {
+    const handle = CreatePortablePickup(pickupHash, coords.x, coords.y, coords.z, placeOnGround, modelHash);
     return WorldObject.fromHandle(handle);
   }
 
@@ -468,12 +448,12 @@ export class WorldObject {
     DetachPortablePickupFromPed(this._handle);
   }
 
-  static doesPickupOfTypeExistInArea(pickupHash: number, x: number, y: number, z: number, radius: number): boolean {
-    return DoesPickupOfTypeExistInArea(pickupHash, x, y, z, radius);
+  static doesPickupOfTypeExistInArea(pickupHash: number, coords: IVector3, radius: number): boolean {
+    return DoesPickupOfTypeExistInArea(pickupHash, coords.x, coords.y, coords.z, radius);
   }
 
-  static doorSystemFindExistingDoor(x: number, y: number, z: number, modelHash: number): [boolean, any] {
-    return DoorSystemFindExistingDoor(x, y, z, modelHash);
+  static doorSystemFindExistingDoor(coords: IVector3, modelHash: number): [boolean, any] {
+    return DoorSystemFindExistingDoor(coords.x, coords.y, coords.z, modelHash);
   }
 
   static doorSystemGetAutomaticDistance(doorHash: number): number {
@@ -549,13 +529,13 @@ export class WorldObject {
     return GetPickupHashFromWeapon(weapon);
   }
 
-  static getSafePickupCoords(x: number, y: number, z: number, p3: number, p4: number): IVector3 {
-    const [x1, y1, z1] = GetSafePickupCoords(x, y, z, p3, p4);
-    return { x:x1, y:y1, z:z1 };
+  static getSafePickupCoords(coords: IVector3, p3: number, p4: number): IVector3 {
+    const [x1, y1, z1] = GetSafePickupCoords(coords.x, coords.y, coords.z, p3, p4);
+    return { x: x1, y: y1, z: z1 };
   }
 
-  static getStateOfClosestDoorOfType(type: number, x: number, y: number, z: number): [any, any] {
-    return GetStateOfClosestDoorOfType(type, x, y, z);
+  static getStateOfClosestDoorOfType(type: number, coords: IVector3): [any, any] {
+    return GetStateOfClosestDoorOfType(type, coords.x, coords.y, coords.z);
   }
 
   static getWeaponTypeFromPickupType(pickupHash: number): number {
@@ -590,8 +570,28 @@ export class WorldObject {
     return IsPlayerPartiallyInsideGarage(garageHash, player, p2);
   }
 
-  static isPointInAngledArea(xPos: number, yPos: number, zPos: number, x1: number, y1: number, z1: number, x2: number, y2: number, z2: number, width: number, p10: boolean, includez: boolean): boolean {
-    return IsPointInAngledArea(xPos, yPos, zPos, x1, y1, z1, x2, y2, z2, width, p10, includez);
+  static isPointInAngledArea(
+    pos: IVector3,
+    coords1: IVector3,
+    coords2: IVector3,
+    width: number,
+    p10: boolean,
+    includez: boolean,
+  ): boolean {
+    return IsPointInAngledArea(
+      pos.x,
+      pos.y,
+      pos.z,
+      coords1.x,
+      coords1.y,
+      coords1.z,
+      coords2.x,
+      coords2.y,
+      coords2.z,
+      width,
+      p10,
+      includez,
+    );
   }
 
   preventCollectionOfPortablePickup(p1: boolean, p2: boolean): void {
@@ -610,8 +610,8 @@ export class WorldObject {
     RemovePickup(pickup);
   }
 
-  static renderFakePickupGlow(x: number, y: number, z: number, colorIndex: number): void {
-    RenderFakePickupGlow(x, y, z, colorIndex);
+  static renderFakePickupGlow(coords: IVector3, colorIndex: number): void {
+    RenderFakePickupGlow(coords.x, coords.y, coords.z, colorIndex);
   }
 
   setEnableArenaPropPhysics(toggle: boolean, p2: number): void {
@@ -650,8 +650,8 @@ export class WorldObject {
     SetPickupUncollectable(p0, p1);
   }
 
-  static setStateOfClosestDoorOfType(type: number, x: number, y: number, z: number, locked: boolean, heading: number, p6: boolean): void {
-    SetStateOfClosestDoorOfType(type, x, y, z, locked, heading, p6);
+  static setStateOfClosestDoorOfType(type: number, coords: IVector3, locked: boolean, heading: number, p6: boolean): void {
+    SetStateOfClosestDoorOfType(type, coords.x, coords.y, coords.z, locked, heading, p6);
   }
 
   static setUnkGlobalBoolRelatedToDamage(value: boolean): void {

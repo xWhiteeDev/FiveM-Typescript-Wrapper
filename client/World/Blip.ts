@@ -3,12 +3,13 @@ import type { IVector3 } from '../typings/Vector3';
 
 export class Blip {
   private _name: string | undefined;
-
+  private static _instances = new Map<number, Blip>();
   private constructor(
     private _handle: number,
     private _sprite?: number,
-  ) {}
-
+  ) {
+    Blip._instances.set(_handle, this);
+  }
 
   static createAtCoords(sprite: number, coords: IVector3): Blip {
     const handle = AddBlipForCoord(coords.x, coords.y, coords.z);
@@ -124,6 +125,14 @@ export class Blip {
     return GetWaypointBlipEnumId();
   }
 
+  static get gpsRouteFound(): boolean {
+    return GetGpsBlipRouteFound();
+  }
+
+  static get gpsRouteLength(): number {
+    return GetGpsBlipRouteLength();
+  }
+
   static isHoveringOverMissionCreator(): boolean {
     return IsHoveringOverMissionCreatorBlip();
   }
@@ -138,6 +147,22 @@ export class Blip {
 
   static setCustomMpHudColor(hudColorId: number): void {
     SetCustomMpHudColor(hudColorId);
+  }
+
+  static setPoliceRadar(toggle: boolean): void {
+    SetPoliceRadarBlips(toggle);
+  }
+
+  static setThisScriptCanRemoveBlipsCreatedByAnyScript(toggle: boolean): void {
+    SetThisScriptCanRemoveBlipsCreatedByAnyScript(toggle);
+  }
+
+  static siren(vehicleHandle: number): void {
+    BlipSiren(vehicleHandle);
+  }
+
+  static triggerSonar(coords: IVector3, radius: number, p4: number): void {
+    TriggerSonarBlip(coords.x, coords.y, coords.z, radius, p4);
   }
 
   static setFakePausemapPlayerPositionThisFrame(x: number, y: number): void {
@@ -176,13 +201,13 @@ export class Blip {
     SetPedHasAiBlipWithColor(pedHandle, hasCone, color);
   }
 
-
   set name(name: string) {
     AddTextEntry('MYBLIP', '~a~');
     BeginTextCommandSetBlipName('MYBLIP');
     AddTextComponentSubstringPlayerName(name);
     EndTextCommandSetBlipName(this._handle);
     this._name = name;
+    Blip._instances.set(this._handle, this);
   }
 
   get name(): string | undefined {
@@ -235,7 +260,6 @@ export class Blip {
     return GetBlipSprite(this._handle);
   }
 
-
   addTextComponentSubstringName(): void {
     AddTextComponentSubstringBlipName(this._handle);
   }
@@ -278,135 +302,168 @@ export class Blip {
 
   remove(): void {
     RemoveBlip(this._handle);
+    Blip._instances.delete(this._handle);
   }
 
   setAlpha(alpha: number): void {
     SetBlipAlpha(this._handle, alpha);
+    Blip._instances.set(this._handle, this);
   }
 
   setAsFriendly(toggle: boolean): void {
     SetBlipAsFriendly(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setAsMissionCreator(toggle: boolean): void {
     SetBlipAsMissionCreatorBlip(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setAsShortRange(toggle: boolean): void {
     SetBlipAsShortRange(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setBright(toggle: boolean): void {
     SetBlipBright(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setCategory(index: number): void {
     SetBlipCategory(this._handle, index);
+    Blip._instances.set(this._handle, this);
   }
 
   setColour(color: number): void {
     SetBlipColour(this._handle, color);
+    Blip._instances.set(this._handle, this);
   }
 
   setCoords(posX: number, posY: number, posZ: number): void {
     SetBlipCoords(this._handle, posX, posY, posZ);
+    Blip._instances.set(this._handle, this);
   }
 
   setDisplay(displayId: number): void {
     SetBlipDisplay(this._handle, displayId);
+    Blip._instances.set(this._handle, this);
   }
 
   setDisplayIndicatorOn(toggle: boolean): void {
     SetBlipDisplayIndicatorOnBlip(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setFade(opacity: number, duration: number): void {
     SetBlipFade(this._handle, opacity, duration);
+    Blip._instances.set(this._handle, this);
   }
 
   setFlashInterval(interval: number): void {
     SetBlipFlashInterval(this._handle, interval);
+    Blip._instances.set(this._handle, this);
   }
 
   setFlashTimer(duration: number): void {
     SetBlipFlashTimer(this._handle, duration);
+    Blip._instances.set(this._handle, this);
   }
 
   setFlashes(toggle: boolean): void {
     SetBlipFlashes(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setFlashesAlternate(toggle: boolean): void {
     SetBlipFlashesAlternate(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setHiddenOnLegend(toggle: boolean): void {
     SetBlipHiddenOnLegend(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setHighDetail(toggle: boolean): void {
     SetBlipHighDetail(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setNameFromFile(gxtEntry: string): void {
     SetBlipNameFromTextFile(this._handle, gxtEntry);
+    Blip._instances.set(this._handle, this);
   }
 
   setNameToPlayerName(player: number): void {
     SetBlipNameToPlayerName(this._handle, player);
+    Blip._instances.set(this._handle, this);
   }
 
   setPriority(priority: number): void {
     SetBlipPriority(this._handle, priority);
+    Blip._instances.set(this._handle, this);
   }
 
   setRadarZoom(zoom: number): void {
     SetRadarZoomToBlip(this._handle, zoom);
+    Blip._instances.set(this._handle, this);
   }
 
   setRadiusEdge(toggle: boolean): void {
     SetRadiusBlipEdge(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setRotation(rotation: number): void {
     SetBlipRotation(this._handle, rotation);
+    Blip._instances.set(this._handle, this);
   }
 
   setRoute(enabled: boolean): void {
     SetBlipRoute(this._handle, enabled);
+    Blip._instances.set(this._handle, this);
   }
 
   setRouteColour(colour: number): void {
     SetBlipRouteColour(this._handle, colour);
+    Blip._instances.set(this._handle, this);
   }
 
   setScale(scale: number): void {
     SetBlipScale(this._handle, scale);
+    Blip._instances.set(this._handle, this);
   }
 
   setScaleTransformation(xScale: number, yScale: number): void {
     SetBlipScaleTransformation(this._handle, xScale, yScale);
+    Blip._instances.set(this._handle, this);
   }
 
   setSecondaryColour(r: number, g: number, b: number): void {
     SetBlipSecondaryColour(this._handle, r, g, b);
+    Blip._instances.set(this._handle, this);
   }
 
   setShowCone(toggle: boolean): void {
     SetBlipShowCone(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setShrink(toggle: boolean): void {
     SetBlipShrink(this._handle, toggle);
+    Blip._instances.set(this._handle, this);
   }
 
   setSprite(spriteId: number): void {
     SetBlipSprite(this._handle, spriteId);
     this._sprite = spriteId;
+    Blip._instances.set(this._handle, this);
   }
 
   setSquaredRotation(heading: number): void {
     SetBlipSquaredRotation(this._handle, heading);
+    Blip._instances.set(this._handle, this);
   }
 
   showCrewIndicatorOn(toggle: boolean): void {
