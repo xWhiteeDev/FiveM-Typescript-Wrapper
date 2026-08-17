@@ -432,24 +432,8 @@ export class Vehicle extends BaseEntity {
   ): boolean {
     return AddVehicleCrewEmblem(this._handle, ped, boneIndex, x1, x2, x3, y1, y2, y3, z1, z2, z3, scale, p13, alpha);
   }
-  removeDecals(): void {
-    RemoveDecalsFromVehicle(this._handle);
-  }
-
   removeCrewEmblem(p1: number): void {
     RemoveVehicleCrewEmblem(this._handle, p1);
-  }
-
-  setParticleFxCamInsideNonplayerVehicle(p1: boolean): void {
-    SetParticleFxCamInsideNonplayerVehicle(this._handle, p1);
-  }
-
-  setParticleFxCamInsideVehicle(p0: boolean): void {
-    SetParticleFxCamInsideVehicle(p0);
-  }
-
-  washDecals(p1: number): void {
-    WashDecalsFromVehicle(this._handle, p1);
   }
 
   networkExplode(isAudible: boolean, isInvisible: boolean, p3: boolean): void {
