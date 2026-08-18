@@ -1,9 +1,11 @@
 import type { eShader } from '../enums/eWorld';
-import {IVector3 } from '../typings/Vector';
+import { IVector3 } from '../typings/Vector';
 import { UTechnique } from '../typings/World';
 import { RGBA } from '../Utils/RGBA';
+import { Entity } from './Entity';
 
 export class BaseEntity {
+  protected _type: Entity = 'BaseEntity';
   constructor(protected _handle: number) {}
   static fromHandle(handle: number): BaseEntity | null {
     if (!DoesEntityExist(handle)) return null;
@@ -156,8 +158,17 @@ export class BaseEntity {
     NetworkRemoveEntityArea(p0);
   }
 
-  static networkSetVehicleWheelsDestructible(vehicleHandle: number, toggle: boolean): void {
-    NetworkSetVehicleWheelsDestructible(vehicleHandle, toggle);
+  networkGetLastVelocityReceived(): IVector3 {
+    const [x, y, z] = NetworkGetLastVelocityReceived(this._handle);
+    return { x, y, z };
+  }
+
+  networkOverrideCoordsAndHeading(pos: IVector3, heading: number): void {
+    NetworkOverrideCoordsAndHeading(this._handle, pos.x, pos.y, pos.z, heading);
+  }
+
+  networkUseLogarithmicBlendingThisFrame(): void {
+    NetworkUseLogarithmicBlendingThisFrame(this._handle);
   }
 
   get handle(): number {
@@ -265,8 +276,8 @@ export class BaseEntity {
     return GetEntitySubmergedLevel(this._handle);
   }
 
-  get type(): number {
-    return GetEntityType(this._handle);
+  get type() {
+    return this._type;
   }
 
   get uprightValue(): number {
@@ -335,7 +346,7 @@ export class BaseEntity {
     return GetEntityArchetypeName(this._handle);
   }
   get mapdataOwner() {
-    return GetEntityMapdataOwner(this._handle)
+    return GetEntityMapdataOwner(this._handle);
   }
   attachBoneToBone(entity2Handle: number, entityBone: number, entityBone2: number, p4: boolean, p5: boolean): void {
     AttachEntityBoneToEntityBone(this._handle, entity2Handle, entityBone, entityBone2, p4, p5);
