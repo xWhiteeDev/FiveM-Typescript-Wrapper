@@ -1,7 +1,10 @@
-import {IVector3} from '../typings/Vector';
+import { IVector3 } from '../typings/Vector';
 import { BaseEntity } from './BaseEntity';
+import {Entity} from './Entity';
 
 export class Ped extends BaseEntity {
+  protected _type: Entity = 'Ped';
+
   constructor(protected _handle: number) {
     super(_handle);
   }
@@ -292,8 +295,8 @@ export class Ped extends BaseEntity {
   applyBloodDamageByZone(p1: any, p2: number, p3: number, p4: any): void {
     ApplyPedBloodDamageByZone(this._handle, p1, p2, p3, p4);
   }
-  get killFallHeight():number {
-    return GetKillFallHeight()
+  get killFallHeight(): number {
+    return GetKillFallHeight();
   }
   applyBloodSpecific(
     component: number,
@@ -2019,5 +2022,50 @@ export class Ped extends BaseEntity {
 
   wasKnockedOut(): boolean {
     return WasPedKnockedOut(this._handle);
+  }
+
+  networkAddToSynchronisedSceneWithIk(
+    netSceneID: number,
+    animDict: string,
+    animClip: string,
+    blendIn: number,
+    blendOut: number,
+    sceneFlags: number,
+    ragdollFlags: number,
+    moverBlendInDelta: number,
+    ikFlags: number,
+  ): void {
+    NetworkAddPedToSynchronisedSceneWithIk(
+      this._handle,
+      netSceneID,
+      animDict,
+      animClip,
+      blendIn,
+      blendOut,
+      sceneFlags,
+      ragdollFlags,
+      moverBlendInDelta,
+      ikFlags,
+    );
+  }
+
+  networkApplyCachedHeadBlendData(player: number): boolean {
+    return NetworkApplyCachedPlayerHeadBlendData(this._handle, player);
+  }
+
+  networkApplyScarData(p1: number): void {
+    NetworkApplyPedScarData(this._handle, p1);
+  }
+
+  networkGetPlayerIndex(): number {
+    return NetworkGetPlayerIndexFromPed(this._handle);
+  }
+
+  networkForceGameStateUpdate(): void {
+    NetworkPedForceGameStateUpdate(this._handle);
+  }
+
+  toNet(): number {
+    return PedToNet(this._handle);
   }
 }
