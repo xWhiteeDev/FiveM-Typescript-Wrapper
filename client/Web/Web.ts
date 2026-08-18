@@ -21,17 +21,17 @@ export class Web {
     }
     SendNUIMessage({ eventName });
   }
-  addEventNUIListender(eventName: string, handler: (data: JSONString, callback: (args?:any) => void) => unknown): void {
+  addEventNUIListener(eventName: string, handler: (data: JSONString, callback: (args?:any) => void) => unknown): void {
     if (!eventName) {
-      console.error('[addEventNUIListender]: eventName argument not provided! ');
+      console.error('[addEventNUIListener]: eventName argument not provided! ');
       return;
     }
     if (typeof eventName !== 'string') {
-      console.error('[addEventNUIListender]: eventName can be only string!');
+      console.error('[addEventNUIListener]: eventName can be only string!');
       return;
     }
     if (!handler) {
-      console.error('[addEventNUIListender]: handler argument not provided!');
+      console.error('[addEventNUIListener]: handler argument not provided!');
       return;
     }
     RegisterNuiCallback(eventName, handler);
