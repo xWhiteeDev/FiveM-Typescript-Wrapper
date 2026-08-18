@@ -1,12 +1,18 @@
+import { VEHICLE_CLASS } from '../constants/const_vehicle';
 import { IVector3 } from '../typings/Vector';
 import { IVehicleOptions } from '../typings/Vehicle';
 import { Utils } from '../Utils/Utils';
 import { BaseEntity } from './BaseEntity';
+import { Entity } from './Entity';
 import { Ped } from './Ped';
 
 export class Vehicle extends BaseEntity {
+  protected _type: Entity = 'Vehicle';
   private constructor(protected _handle: number) {
     super(_handle);
+  }
+  get type() {
+    return this._type;
   }
   static async create(model: string, coords: IVector3, optional?: IVehicleOptions): Promise<Vehicle | undefined> {
     const hashKey = GetHashKey(model);
@@ -187,7 +193,7 @@ export class Vehicle extends BaseEntity {
     SetVehicleGravityAmount(this._handle, gravity);
   }
 
-  setHandlingField(className: string, fieldName: string, value: any): void {
+  setHandlingField(className: string, fieldName: string, value: number): void {
     SetVehicleHandlingField(this._handle, className, fieldName, value);
   }
 
@@ -427,17 +433,41 @@ export class Vehicle extends BaseEntity {
     z2: number,
     z3: number,
     scale: number,
-    p13: any,
+    p13: number,
     alpha: number,
   ): boolean {
     return AddVehicleCrewEmblem(this._handle, ped, boneIndex, x1, x2, x3, y1, y2, y3, z1, z2, z3, scale, p13, alpha);
   }
+  removeDecals(): void {
+    RemoveDecalsFromVehicle(this._handle);
+  }
+
   removeCrewEmblem(p1: number): void {
     RemoveVehicleCrewEmblem(this._handle, p1);
   }
 
+  getCrewEmblemRequestState(p1: number): number {
+    return GetVehicleCrewEmblemRequestState(this._handle, p1);
+  }
+
+  setParticleFxCamInsideNonplayerVehicle(p1: boolean): void {
+    SetParticleFxCamInsideNonplayerVehicle(this._handle, p1);
+  }
+
+  setParticleFxCamInsideVehicle(p0: boolean): void {
+    SetParticleFxCamInsideVehicle(p0);
+  }
+
+  washDecals(p1: number): void {
+    WashDecalsFromVehicle(this._handle, p1);
+  }
+
   networkExplode(isAudible: boolean, isInvisible: boolean, p3: boolean): void {
     NetworkExplodeVehicle(this._handle, isAudible, isInvisible, p3);
+  }
+
+  networkExplodeHeli(isAudible: boolean, isInvisible: boolean, netScriptEntityId: number): void {
+    NetworkExplodeHeli(this._handle, isAudible, isInvisible, netScriptEntityId);
   }
 
   networkSetWheelsDestructible(toggle: boolean): void {
@@ -516,8 +546,8 @@ export class Vehicle extends BaseEntity {
     );
   }
 
-  attachVehicleToCargobob(cargobobHandle: number, vehicleBoneIndex: number, x: number, y: number, z: number): void {
-    AttachVehicleToCargobob(cargobobHandle, this._handle, vehicleBoneIndex, x, y, z);
+  attachVehicleToCargobob(cargobobHandle: number, vehicleBoneIndex: number, coords: IVector3): void {
+    AttachVehicleToCargobob(cargobobHandle, this._handle, vehicleBoneIndex, coords.x, coords.y, coords.z);
   }
 
   attachVehicleToTowTruck(
@@ -767,7 +797,7 @@ export class Vehicle extends BaseEntity {
     return GetIsVehiclePrimaryColourCustom(this._handle);
   }
 
- get  isVehicleSecondaryColourCustom(): boolean {
+  get isVehicleSecondaryColourCustom(): boolean {
     return GetIsVehicleSecondaryColourCustom(this._handle);
   }
 
@@ -918,8 +948,10 @@ export class Vehicle extends BaseEntity {
     return GetVehicleCauseOfDestruction(this._handle);
   }
 
-  get vehicleClass(): number {
-    return GetVehicleClass(this._handle);
+  get vehicleClass(): [string, number] {
+    const vehClassNumber = GetVehicleClass(this._handle) as keyof typeof VEHICLE_CLASS;
+    const vehClassString = VEHICLE_CLASS[vehClassNumber] ?? 'Unknown Vehicle Class';
+    return [vehClassString, vehClassNumber];
   }
 
   static getVehicleClassEstimatedMaxSpeed(vehicleClass: number): number {
@@ -1250,8 +1282,8 @@ export class Vehicle extends BaseEntity {
     return IsAnyPedRappellingFromHeli(this._handle);
   }
 
-  static isAnyVehicleNearPoint(x: number, y: number, z: number, radius: number): boolean {
-    return IsAnyVehicleNearPoint(x, y, z, radius);
+  static isAnyVehicleNearPoint(coords: IVector3, radius: number): boolean {
+    return IsAnyVehicleNearPoint(coords.x, coords.y, coords.z, radius);
   }
 
   get isBigVehicle(): boolean {
@@ -1469,7 +1501,7 @@ export class Vehicle extends BaseEntity {
     RemoveVehicleAsset(vehicleAsset);
   }
 
-  static removeVehicleCombatAvoidanceArea(p0: any): void {
+  static removeVehicleCombatAvoidanceArea(p0: number): void {
     RemoveVehicleCombatAvoidanceArea(p0);
   }
 
@@ -1741,7 +1773,7 @@ export class Vehicle extends BaseEntity {
     SetVehicleAllowNoPassengersLockon(this._handle, toggle);
   }
 
-  setVehicleAutomaticallyAttaches(p1: boolean, p2: any): void {
+  setVehicleAutomaticallyAttaches(p1: boolean, p2: number): void {
     SetVehicleAutomaticallyAttaches(this._handle, p1, p2);
   }
 
@@ -2008,8 +2040,8 @@ export class Vehicle extends BaseEntity {
     SetVehicleGeneratesEngineShockingEvents(this._handle, toggle);
   }
 
-  static setVehicleGeneratorAreaOfInterest(x: number, y: number, z: number, radius: number): void {
-    SetVehicleGeneratorAreaOfInterest(x, y, z, radius);
+  static setVehicleGeneratorAreaOfInterest(coords: IVector3, radius: number): void {
+    SetVehicleGeneratorAreaOfInterest(coords.x, coords.y, coords.z, radius);
   }
 
   setVehicleGravity(toggle: boolean): void {
@@ -2433,15 +2465,31 @@ export class Vehicle extends BaseEntity {
     UnpausePlaybackRecordedVehicle(this._handle);
   }
 
-  static addRoadNodeSpeedZone(x: number, y: number, z: number, radius: number, speed: number, p5: boolean): number {
-    return AddRoadNodeSpeedZone(x, y, z, radius, speed, p5);
+  static addRoadNodeSpeedZone(coords: IVector3, radius: number, speed: number, p5: boolean): number {
+    return AddRoadNodeSpeedZone(coords.x, coords.y, coords.z, radius, speed, p5);
   }
 
-  static addVehicleCombatAngledAvoidanceArea(p0: number, p1: number, p2: number, p3: number, p4: number, p5: number, p6: number): any {
+  static addVehicleCombatAngledAvoidanceArea(
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: number,
+    p4: number,
+    p5: number,
+    p6: number,
+  ): number {
     return AddVehicleCombatAngledAvoidanceArea(p0, p1, p2, p3, p4, p5, p6);
   }
 
-  static addVehicleStuckCheckWithWarp(p0: any, p1: number, p2: any, p3: boolean, p4: boolean, p5: boolean, p6: any): void {
+  static addVehicleStuckCheckWithWarp(
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: boolean,
+    p4: boolean,
+    p5: boolean,
+    p6: number,
+  ): void {
     AddVehicleStuckCheckWithWarp(p0, p1, p2, p3, p4, p5, p6);
   }
 
@@ -2465,8 +2513,8 @@ export class Vehicle extends BaseEntity {
     AttachContainerToHandlerFrame(this._handle, container);
   }
 
-  attachEntityToCargobob(entity: number, p2: number, x: number, y: number, z: number): void {
-    AttachEntityToCargobob(this._handle, entity, p2, x, y, z);
+  attachEntityToCargobob(entity: number, p2: number, coords: IVector3): void {
+    AttachEntityToCargobob(this._handle, entity, p2, coords.x, coords.y, coords.z);
   }
 
   canAnchorBoatHere(): boolean {
@@ -2501,16 +2549,50 @@ export class Vehicle extends BaseEntity {
     CloseBombBayDoors(this._handle);
   }
 
-  static createMissionTrain(variation: number, x: number, y: number, z: number, direction: boolean): Vehicle {
-    return Vehicle.fromHandle(CreateMissionTrain(variation, x, y, z, direction));
+  static createMissionTrain(variation: number, coords: IVector3, direction: boolean): Vehicle {
+    return Vehicle.fromHandle(CreateMissionTrain(variation, coords.x, coords.y, coords.z, direction));
   }
 
   createPickUpRopeForCargobob(state: number): void {
     CreatePickUpRopeForCargobob(this._handle, state);
   }
 
-  static createScriptVehicleGenerator(x: number, y: number, z: number, heading: number, p4: number, p5: number, modelHash: number, p7: number, p8: number, p9: number, p10: number, p11: boolean, p12: boolean, p13: boolean, p14: boolean, p15: boolean, p16: number): number {
-    return CreateScriptVehicleGenerator(x, y, z, heading, p4, p5, modelHash, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16);
+  static createScriptVehicleGenerator(
+    coords: IVector3,
+    heading: number,
+    p4: number,
+    p5: number,
+    modelHash: number,
+    p7: number,
+    p8: number,
+    p9: number,
+    p10: number,
+    p11: boolean,
+    p12: boolean,
+    p13: boolean,
+    p14: boolean,
+    p15: boolean,
+    p16: number,
+  ): number {
+    return CreateScriptVehicleGenerator(
+      coords.x,
+      coords.y,
+      coords.z,
+      heading,
+      p4,
+      p5,
+      modelHash,
+      p7,
+      p8,
+      p9,
+      p10,
+      p11,
+      p12,
+      p13,
+      p14,
+      p15,
+      p16,
+    );
   }
 
   static deleteAllTrains(): void {
@@ -2533,7 +2615,7 @@ export class Vehicle extends BaseEntity {
     DetachContainerFromHandlerFrame(this._handle);
   }
 
-  detachEntityFromCargobob(entity: number): any {
+  detachEntityFromCargobob(entity: number): number {
     return DetachEntityFromCargobob(this._handle, entity);
   }
 
@@ -2565,8 +2647,8 @@ export class Vehicle extends BaseEntity {
     return DoesScriptVehicleGeneratorExist(vehicleGenerator);
   }
 
-  ejectJb700Roof(x: number, y: number, z: number): void {
-    EjectJb700Roof(this._handle, x, y, z);
+  ejectJb700Roof(coords: IVector3): void {
+    EjectJb700Roof(this._handle, coords.x, coords.y, coords.z);
   }
 
   enableIndividualPlanePropeller(propeller: number): void {
@@ -2590,7 +2672,7 @@ export class Vehicle extends BaseEntity {
     ForceSubmarineSurfaceMode(this._handle, toggle);
   }
 
-  static get allVehicles(): [number, unknown] {
+  static get allVehicles(): number[] {
     return GetGamePool('CVehicle');
   }
 
@@ -2611,8 +2693,8 @@ export class Vehicle extends BaseEntity {
     return { x, y, z };
   }
 
-  static getClosestVehicle(x: number, y: number, z: number, radius: number, modelHash: number, flags: number): Vehicle {
-    return Vehicle.fromHandle(GetClosestVehicle(x, y, z, radius, modelHash, flags));
+  static getClosestVehicle(coords: IVector3, radius: number, modelHash: number, flags: number): Vehicle {
+    return Vehicle.fromHandle(GetClosestVehicle(coords.x, coords.y, coords.z, radius, modelHash, flags));
   }
 
   get driftTyresEnabled(): boolean {
@@ -2677,16 +2759,32 @@ export class Vehicle extends BaseEntity {
     return { x, y, z };
   }
 
-  static getRandomVehicleBackBumperInSphere(p0: number, p1: number, p2: number, p3: number, p4: number, p5: number, p6: number): Vehicle {
+  static getRandomVehicleBackBumperInSphere(
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: number,
+    p4: number,
+    p5: number,
+    p6: number,
+  ): Vehicle {
     return Vehicle.fromHandle(GetRandomVehicleBackBumperInSphere(p0, p1, p2, p3, p4, p5, p6));
   }
 
-  static getRandomVehicleFrontBumperInSphere(p0: number, p1: number, p2: number, p3: number, p4: number, p5: number, p6: number): Vehicle {
+  static getRandomVehicleFrontBumperInSphere(
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: number,
+    p4: number,
+    p5: number,
+    p6: number,
+  ): Vehicle {
     return Vehicle.fromHandle(GetRandomVehicleFrontBumperInSphere(p0, p1, p2, p3, p4, p5, p6));
   }
 
-  static getRandomVehicleInSphere(x: number, y: number, z: number, radius: number, modelHash: number, flags: number): Vehicle {
-    return Vehicle.fromHandle(GetRandomVehicleInSphere(x, y, z, radius, modelHash, flags));
+  static getRandomVehicleInSphere(coords: IVector3, radius: number, modelHash: number, flags: number): Vehicle {
+    return Vehicle.fromHandle(GetRandomVehicleInSphere(coords.x, coords.y, coords.z, radius, modelHash, flags));
   }
 
   static getRandomVehicleModelInMemory(p0: boolean): [any, any] {
@@ -2743,7 +2841,7 @@ export class Vehicle extends BaseEntity {
     return HasFilledVehiclePopulation();
   }
 
-  static hasPreloadModsFinished(p0: any): boolean {
+  static hasPreloadModsFinished(p0: number): boolean {
     return HasPreloadModsFinished(p0);
   }
 
@@ -2863,7 +2961,7 @@ export class Vehicle extends BaseEntity {
     LowerRetractableWheels(this._handle);
   }
 
-  static preloadVehicleMod(p0: any, modType: number, p2: any): void {
+  static preloadVehicleMod(p0: number, modType: number, p2: number): void {
     PreloadVehicleMod(p0, modType, p2);
   }
 
@@ -2883,7 +2981,15 @@ export class Vehicle extends BaseEntity {
     return RemoveRoadNodeSpeedZone(speedzone);
   }
 
-  static removeVehiclesFromGeneratorsInArea(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number, unk: any): void {
+  static removeVehiclesFromGeneratorsInArea(
+    x1: number,
+    y1: number,
+    z1: number,
+    x2: number,
+    y2: number,
+    z2: number,
+    unk: number,
+  ): void {
     RemoveVehiclesFromGeneratorsInArea(x1, y1, z1, x2, y2, z2, unk);
   }
 
@@ -2895,7 +3001,16 @@ export class Vehicle extends BaseEntity {
     SetAllVehicleGeneratorsActive();
   }
 
-  static setAllVehicleGeneratorsActiveInArea(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number, p6: boolean, p7: boolean): void {
+  static setAllVehicleGeneratorsActiveInArea(
+    x1: number,
+    y1: number,
+    z1: number,
+    x2: number,
+    y2: number,
+    z2: number,
+    p6: boolean,
+    p7: boolean,
+  ): void {
     SetAllVehicleGeneratorsActiveInArea(x1, y1, z1, x2, y2, z2, p6, p7);
   }
 
@@ -3043,8 +3158,8 @@ export class Vehicle extends BaseEntity {
     SetHeliBladesSpeed(this._handle, speed);
   }
 
-  setHeliCombatOffset(x: number, y: number, z: number): void {
-    SetHeliCombatOffset(this._handle, x, y, z);
+  setHeliCombatOffset(coords: IVector3): void {
+    SetHeliCombatOffset(this._handle, coords.x, coords.y, coords.z);
   }
 
   setHeliMainRotorHealth(health: number): void {
@@ -3088,11 +3203,12 @@ export class Vehicle extends BaseEntity {
   }
 
   setMissionTrainAsNoLongerNeeded(p1: boolean): void {
-    SetMissionTrainAsNoLongerNeeded(p1);
+    //@ts-ignore
+    SetMissionTrainAsNoLongerNeeded(this._handle, p1); //Note: Function prob. requires two arguments.
   }
 
-  setMissionTrainCoords(x: number, y: number, z: number): void {
-    SetMissionTrainCoords(this._handle, x, y, z);
+  setMissionTrainCoords(coords: IVector3): void {
+    SetMissionTrainCoords(this._handle, coords.x, coords.y, coords.z);
   }
 
   setOppressorTransformState(extend: boolean): void {
