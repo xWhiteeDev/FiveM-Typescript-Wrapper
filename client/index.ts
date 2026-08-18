@@ -1,4 +1,6 @@
 export { CFX } from './CFX/cfx';
+export { Network } from './CFX/Network';
+
 export { LocalPlayer } from './Entities/LocalPlayer';
 export { Vehicle } from './Entities/Vehicle';
 export { BaseEntity } from './Entities/BaseEntity';
@@ -27,4 +29,3 @@ export { Scaleform } from './Graphics/Scaleform';
 export { ScreenEffects } from './Graphics/ScreenEffects';
 export { Timecycle } from './Graphics/TimeCycle';
 export { TvChannel } from './Graphics/TvChannel';
- 
