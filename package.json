@@ -1,6 +1,6 @@
 {
   "name": "fivem-typescript",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A FiveM simple typescript wrapper",
   "exports": {
     "./server": {
