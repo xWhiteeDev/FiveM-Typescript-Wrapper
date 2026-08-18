@@ -1,4 +1,4 @@
-import { IVector3 } from '../typings/Vector3';
+import { IVector3 } from '../typings/Vector';
 import { IVehicleOptions } from '../typings/Vehicle';
 import { Utils } from '../Utils/Utils';
 import { BaseEntity } from './BaseEntity';

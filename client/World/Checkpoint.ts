@@ -1,4 +1,4 @@
-import { IVector3 } from '../typings/Vector3';
+import { IVector3 } from '../typings/Vector';
 import { RGBA } from '../typings/World';
 
 export class Checkpoint {

@@ -1,5 +1,5 @@
 import type { BlipOptions } from '../typings/Blip';
-import type { IVector3 } from '../typings/Vector3';
+import type { IVector3 } from '../typings/Vector';
 
 export class Blip {
   private _name: string | undefined;

@@ -1,5 +1,5 @@
 import type { eShader } from '../enums/eWorld';
-import {IVector3 } from '../typings/Vector3';
+import {IVector3 } from '../typings/Vector';
 import { UTechnique } from '../typings/World';
 import { RGBA } from '../Utils/RGBA';
 

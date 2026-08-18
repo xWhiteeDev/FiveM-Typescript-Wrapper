@@ -1,4 +1,5 @@
 import { JSONString } from '../typings/Unions';
+import {IVector2} from '../typings/Vector';
 
 export class Web {
   private id: number = 0;
@@ -112,7 +113,7 @@ export class Web {
     SetNuiZindex(zIndex);
   }
 
-  getNuiCursorPosition(): { x: number; y: number } {
+  getNuiCursorPosition(): IVector2 {
     const [x, y] = GetNuiCursorPosition();
     return { x, y };
   }

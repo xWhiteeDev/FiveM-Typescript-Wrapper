@@ -1,4 +1,4 @@
-import type { IVector3 } from '../typings/Vector3';
+import type { IVector3 } from '../typings/Vector';
 
 export class Rope {
     constructor (private _handle:number) {

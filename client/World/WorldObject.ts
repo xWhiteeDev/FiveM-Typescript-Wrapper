@@ -1,4 +1,4 @@
-import type { IVector3 } from '../typings/Vector3';
+import type { IVector3 } from '../typings/Vector';
 import { Utils } from '../Utils/Utils';
 import { Ped } from '../Entities/Ped';
 

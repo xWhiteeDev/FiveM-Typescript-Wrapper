@@ -1,7 +1,7 @@
 //Version 1.0
 //It can't be ideal. It only needs to work actually.
 
-import { IVector3 } from '../typings/Vector3';
+import { IVector3 } from '../typings/Vector';
 import {
   IPedProperties,
   IWeaponOptions,

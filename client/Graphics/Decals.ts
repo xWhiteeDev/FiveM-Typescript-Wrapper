@@ -1,5 +1,5 @@
 import type { Vehicle } from '../Entities/Vehicle';
-import type { IVector3 } from '../typings/Vector3';
+import type { IVector3 } from '../typings/Vector';
 
 export class Decal {
   constructor(private _handle: number) {}

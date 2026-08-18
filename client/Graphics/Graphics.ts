@@ -1,4 +1,4 @@
-import type { IVector3 } from '../typings/Vector3';
+import type { IVector3 } from '../typings/Vector';
 import type { RGBA } from '../Utils/RGBA';
 
 export class Graphics {

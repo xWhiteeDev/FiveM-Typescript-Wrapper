@@ -1,5 +1,5 @@
 import type { Ped } from '../Entities/Ped';
-import { IVector3 } from '../typings/Vector3';
+import { IVector3 } from '../typings/Vector';
 import type { RGB, RGBA } from '../Utils/RGBA';
 
 export class DebugDraw {

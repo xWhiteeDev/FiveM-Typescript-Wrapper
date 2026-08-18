@@ -1,4 +1,4 @@
-import {IVector3} from '../typings/Vector3';
+import {IVector3} from '../typings/Vector';
 import { BaseEntity } from './BaseEntity';
 
 export class Ped extends BaseEntity {
